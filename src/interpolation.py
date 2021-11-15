@@ -3,6 +3,28 @@ from sympy.printing.printer import Printer
 import linear_equations
 import numpy as np
 
+def interpolate(method, X, Y):
+    X2 = X
+    # validate X, Y and sort
+    if len(Y) != len(X):
+        return "Error"
+    if len(list(set(X2))) != len(X):
+        return "Error 2"
+
+    if method == 'vandermonde':
+        return vandermonde(X, Y)
+    elif method == 'dividedDifference':
+        return dividedDifference(X, Y)
+    elif method == 'lagrange':
+        return lagrange(X, Y)
+    elif method == 'linearSplines':
+        return linearSplines(X, Y)
+    elif method == 'quadraticSplines':
+        return quadraticSplines(X, Y)
+    else:
+        print("Invalid Method")
+        return("Invalid Method") 
+
 
 def vandermonde(X, Y):
     vandermondeMatrix = []
@@ -63,50 +85,34 @@ def lagrange(X, Y):
     return P
 
 
-# def linealSplines(X, Y, xValue):
-    
-#     def linealEquation(x1, y1, x2, y2, x):
-#         return (((y2-y1)/(x2-x1))*(x-x1)) + y1
-    
-#     equations = []
-#     cont = 0
-#     for i in range(1, len(X)):
-#        value = linealEquation(X[i-1], Y[i-1], X[i], Y[i], xValue)
-#        equations.append(value)
-#        cont += 1
+def linearSplines(X, Y):
 
-def linealSplines(X, Y):
+    x = symbols('x')
 
     X, Y = zip(*sorted(zip(X, Y)))
 
     def linealEquation(x1, y1, x2, y2):
         return lambda x: (((y2-y1)/(x2-x1))*(x-x1)) + y1
 
-    def condition(rhs, xp, xc):
-        return lambda x: rhs(xp, x) and xc >= x
-
     equations = []
     cont = 0
     for i in range(1, len(X)):
-        if cont == 0:
-            cond = lambda x, y: x <= y
-        else:
-            cond = lambda x, y: x < y
-        value = (linealEquation(X[i-1], Y[i-1], X[i], Y[i]), condition(cond, X[i-1], X[i]))
+        value = (linealEquation(X[i-1], Y[i-1], X[i], Y[i]), ((X[i-1] <= x) if cont == 0 else (X[i-1] < x)) & (x <= X[i]))
         equations.append(value)
         cont += 1
 
-    def piecewise(x):
-        for i in equations:
-            if i[1](x):
-                return i[0](x)
-        return None
+    expr = Piecewise(*[(e[0](x), e[1]) for e in equations])
 
-    return piecewise, equations
+    def piecewise(xpred):
+        from sympy.utilities.lambdify import lambdify, implemented_function
+        return (lambdify(x, expr)(xpred).item())
 
+    return piecewise, expr
 
-
-def quadraticSplines(X,Y, xValue):
+def quadraticSplines(X, Y):
+    X, Y = zip(*sorted(zip(X, Y)))
+    
+    conditions = []
     A = []
     # Basic equations
     for i in range(0, len(X)-1):
@@ -115,7 +121,6 @@ def quadraticSplines(X,Y, xValue):
         auxList.extend([X[i]**2, X[i], 1])
         if i < (len(X)-1):
             auxList.extend([0]*(3*(len(X)-1)-(3*(i+1))))
-        #print(auxList)
         A.append(auxList)
         
         auxList = []
@@ -123,7 +128,6 @@ def quadraticSplines(X,Y, xValue):
         auxList.extend([X[i+1]**2, X[i+1], 1])
         if i < (len(X)-1):
             auxList.extend([0]*(3*(len(X)-1)-(3*(i+1))))
-        #print(auxList)
         A.append(auxList)
 
     # Equations of derivates
@@ -133,7 +137,7 @@ def quadraticSplines(X,Y, xValue):
         auxList.extend([2*X[i], 1, 0,-2*X[i], -1])
         if i < (len(X)-1):
             auxList.extend([0]*(3*(len(X)-1)-(3*(i+1))+1))
-        print(auxList)
+        #print(auxList)
         A.append(auxList)
 
     # Last equation   
@@ -148,16 +152,25 @@ def quadraticSplines(X,Y, xValue):
     Ypartial.extend([0]*((3*(len(X)-1))-(2*(len(X)-1))))
 
     Ycol = np.array(Ypartial).T
-    #sol = linear_equations.gauss(A, Ycol)
-    for i in range(0, len(A)):
-        print(A[i])
-    print("")
-    print(Ycol)
     
     sol = np.linalg.solve(A,Ycol)
     sol = np.round(sol, decimals = 4)
-    #sol = linear_equations.gauss_par(A, Ycol)
-    print(sol)
+
+    eqs = []
+    idx = 0
+    x = symbols('x')
+    for i in range(1, len(X)):
+        c = (sol[idx], sol[idx + 1], sol[idx + 2])
+        eqs.append((c[0] * x**2 + c[1] * x + c[2], ((X[i-1] <= x) if idx == 0 else (X[i-1] < x)) & (x <= X[i])))
+        idx += 3
+
+    expr = Piecewise(*eqs)
+
+    def piecewise(xpred):
+        from sympy.utilities.lambdify import lambdify, implemented_function
+        return (lambdify(x, expr)(xpred).item())
+
+    return piecewise, expr
         
 
 ######### Examples ##########
@@ -178,16 +191,21 @@ y = [7, -1, -8, 2]
 #p = lagrange(x, y)
 #print(asPolynomial(p))
 
+
+##### Linear Splines
 x = [3, -2, 1, 4]
 y = [1, 5, 1, 2]
-print(linealSplines(x, y)[0](2))
+#print(linearSplines(x, y)[1])
 
 
 ####### Quadratic splines
-x = [1, 2, 4]
-y= [141, 112.7, 125.63]
+#x = [1, 2, 4]
+#y= [141, 112.7, 125.63]
 
-x = [2, 3, 5, 6, 8]
-y = [3.2, 4.8, 2.9, 9.1, 12.4]
+x = [2, 3, 5, 8, 6]
+y = [3.2, 4.8, 2.9, 12.4, 9.1]
 
-#quadraticSplines(x, y, 6)
+#print(quadraticSplines(x, y)[0](8))
+#print(len(list(set(x))) != len(x))
+
+print(interpolate("asa",x, y))
