@@ -108,14 +108,9 @@ def jacobi(a, b, x0, tol, nmax):
     xant = x0
     e = 1000
     cont = 0
-    while e > tol and cont < nmax:
-        xact = np.dot(t, xant)+c
-        e = np.linalg.norm(xant-xact)
-        xant = xact
-        cont+=1
-    
-    result = xact[0:n, 0]
-    return result, cont, e
+    rest_xact, res_cont, res_e = iterate(e, tol, cont, nmax, t, xant, c)
+    result = rest_xact[0:n, 0]
+    return result, res_cont, res_e
 
 # Gauss-Seidel
 def gseidel(a, b, x0, tol, nmax):
@@ -128,14 +123,9 @@ def gseidel(a, b, x0, tol, nmax):
     xant = x0
     e = 1000
     cont = 0
-    while e > tol and cont < nmax:
-        xact = np.dot(t, xant)+c
-        e = np.linalg.norm(xant-xact)
-        xant = xact
-        cont+=1
-    
-    result = xact[0:n, 0]
-    return result, cont, e
+    rest_xact, res_cont, res_e = iterate(e, tol, cont, nmax, t, xant, c)
+    result = rest_xact[0:n, 0]
+    return result, res_cont, res_e
 
 # SOR
 def sor(a, b, x0, w, tol, nmax):
@@ -149,15 +139,18 @@ def sor(a, b, x0, w, tol, nmax):
     xant = x0
     e = 1000
     cont = 0
-    while e > tol and cont < nmax:
-        xact = np.dot(t, xant)+c
-        e = np.linalg.norm(xant-xact)
-        xant = xact
-        cont+=1
-    
-    result = xact[0:n, 0]
-    return result, cont, e
+    rest_xact, res_cont, res_e = iterate(e, tol, cont, nmax, t, xant, c)
+    result = rest_xact[0:n, 0]
+    return result, res_cont, res_e
 
+# Auxiliar function for looping in iterative methods
+def iterate(e, tol, cont, nmax, t, xant, c):
+        while e > tol and cont < nmax:
+            xact = np.dot(t, xant)+c
+            e = np.linalg.norm(xant-xact)
+            xant = xact
+            cont+=1
+        return xact, cont, e
 
 # Gaussian elimination with complete pivoting
 def gauss_tot():
@@ -197,6 +190,9 @@ if __name__ == "__main__":
     b = [[12], [32], [-24], [14]]'''
     a= [[3, -1, 1], [1, -8, -2], [1, 1, 5]]
     b=[[-2], [1], [4]]
+    print(jacobi(a, b, 0, 0.0001, 100))
+    print(gseidel(a, b, 0, 0.0001, 100))
+    print(sor(a, b, 0, 0.5, 0.0001, 100))
     # Para testing con pivoteo total
     '''a =[[1, 1, 1, 0, 0, 0],
         [4, 2, 1, 0, 0, 0],
