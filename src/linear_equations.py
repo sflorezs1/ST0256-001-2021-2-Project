@@ -1,8 +1,6 @@
 import numpy as np
 import sys
 
-from numpy.lib.nanfunctions import nanmax
-
 # Simple Gaussian elimination
 def gauss(a, b):
     n = len(a)
@@ -16,6 +14,40 @@ def gauss(a, b):
                 sys.exit('Divide by zero')
     x = back_subst(m)
     return x
+
+# Gaussian elimination with complete pivoting
+def gauss_tot(a, b):
+    n = len(a)
+    m = (np.c_[a, b]).astype(float)
+    order = []
+    
+    for i in range(n):
+        aux0, b = np.where(abs(m[i:n, i:n]) == (
+            abs(m[i:n, i:n]).max()).max())
+        # column change
+        if b[0]+i != i:
+            order.append((i, b[0]+i))
+            aux2 = m[:, b[0]+i].copy()
+            m[:, b[0]+i] = m[:, i]
+            m[:, i] = aux2
+        # row change
+        if aux0[0]+i != i:
+            aux2 = m[i+aux0[0], i:n+1].copy()
+            m[aux0[0]+i, i:n+1] = m[i, i:n+1]
+            m[i, i:n+1] = aux2
+        for j in range(i+1, n):
+            if m[i, i] != 0:
+                m[j, i:n+1] = m[j, i:n+1]-(m[j, i]/m[i, i])*m[i, i:n+1]
+            else:
+                sys.exit('Divide by zero')
+    x = back_subst(m)
+    size = len(order)-1
+    for i in range(size, -1, -1):
+        aux = x[order[i][0]]
+        x[order[i][0]] = x[order[i][1]]
+        x[order[i][1]] = aux
+    return x
+    
 
 # Gaussian elimination with parcial pivoting
 def gauss_par(a, b):
@@ -152,11 +184,6 @@ def iterate(e, tol, cont, nmax, t, xant, c):
             cont+=1
         return xact, cont, e
 
-# Gaussian elimination with complete pivoting
-def gauss_tot():
-    pass
-
-
 def forw_subst(l, b):
     n = len(l)
     z = np.zeros_like(b, dtype=np.double)
@@ -187,18 +214,20 @@ if __name__ == "__main__":
          [3, 15, 2, -5],
          [-7, 4, -23, 2],
          [1, -3, -2, 16]]
-    b = [[12], [32], [-24], [14]]'''
+    b = [[12], [32], [-24], [14]]
+    
     a= [[3, -1, 1], [1, -8, -2], [1, 1, 5]]
-    b=[[-2], [1], [4]]
-    print(jacobi(a, b, 0, 0.0001, 100))
+    b=[[-2], [1], [4]]'''
+    '''print(jacobi(a, b, 0, 0.0001, 100))
     print(gseidel(a, b, 0, 0.0001, 100))
-    print(sor(a, b, 0, 0.5, 0.0001, 100))
+    print(sor(a, b, 0, 0.5, 0.0001, 100))'''
     # Para testing con pivoteo total
-    '''a =[[1, 1, 1, 0, 0, 0],
+    a =[[1, 1, 1, 0, 0, 0],
         [4, 2, 1, 0, 0, 0],
         [0, 0, 0, 4, 2, 1],
         [0, 0, 0, 16, 4, 1],
         [4, 1, 0, -4, -1, 0],
         [2, 0, 0, 0, 0, 0]]
-    b= [[141],   [112.7],  [112.7],  [125.63],   [0],     [0]]'''
-    # 3
+    b= [[141],   [112.7],  [112.7],  [125.63],   [0],     [0]]
+    print(gauss_tot(a, b))
+    
