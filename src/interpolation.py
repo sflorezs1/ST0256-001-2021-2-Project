@@ -2,12 +2,14 @@ from sympy import *
 from sympy.printing.printer import Printer
 import linear_equations
 import numpy as np
+import Exception
+
 
 def interpolate(method, X, Y):
     X2 = X
     # validate X, Y and sort
     if len(Y) != len(X):
-        return "Error"
+        raise ""
     if len(list(set(X2))) != len(X):
         return "Error 2"
 
