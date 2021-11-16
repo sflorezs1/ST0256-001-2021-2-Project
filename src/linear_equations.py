@@ -1,6 +1,8 @@
 import numpy as np
 import sys
 
+from numpy.lib.nanfunctions import nanmax
+
 # Simple Gaussian elimination
 def gauss(a, b):
     n = len(a)
@@ -89,23 +91,72 @@ def lu_pp(a, b):
         u[i, i:n] = m[i, i:n]
         u[i, i:n] = m[i, i:n]
     u[n-1, n-1] = m[n-1, n-1]
-    
+
     z = forw_subst(l, np.dot(p, b))
     x = back_subst((np.c_[u, z]).astype(float))
     return x
 
 
 # Jacobi
-def jacobi():
-    pass
+def jacobi(a, b, x0, tol, nmax):
+    n = len(a)
+    d = np.diag(np.diag(a))
+    l = -(np.tril(a, -1))
+    u = -(np.triu(a, 1))
+    t = np.dot(np.linalg.inv(d), (l+u))
+    c = np.dot(np.linalg.inv(d), b)
+    xant = x0
+    e = 1000
+    cont = 0
+    while e > tol and cont < nmax:
+        xact = np.dot(t, xant)+c
+        e = np.linalg.norm(xant-xact)
+        xant = xact
+        cont+=1
+    
+    result = xact[0:n, 0]
+    return result, cont, e
 
 # Gauss-Seidel
-def gseidel():
-    pass
+def gseidel(a, b, x0, tol, nmax):
+    n = len(a)
+    d = np.diag(np.diag(a))
+    l = -(np.tril(a))+d
+    u = -(np.triu(a))+d
+    t = np.dot(np.linalg.inv(d-l), u)
+    c = np.dot(np.linalg.inv(d-l), b)
+    xant = x0
+    e = 1000
+    cont = 0
+    while e > tol and cont < nmax:
+        xact = np.dot(t, xant)+c
+        e = np.linalg.norm(xant-xact)
+        xant = xact
+        cont+=1
+    
+    result = xact[0:n, 0]
+    return result, cont, e
 
 # SOR
-def sor():
-    pass
+def sor(a, b, x0, w, tol, nmax):
+    n = len(a)
+    d = np.diag(np.diag(a))
+    l = -(np.tril(a))+d
+    u = -(np.triu(a))+d
+
+    t = np.dot(np.linalg.inv(d-(w*l)), ((1-w)*d+w*u))
+    c = w*np.dot(np.linalg.inv(d-(w*l)), b)
+    xant = x0
+    e = 1000
+    cont = 0
+    while e > tol and cont < nmax:
+        xact = np.dot(t, xant)+c
+        e = np.linalg.norm(xant-xact)
+        xant = xact
+        cont+=1
+    
+    result = xact[0:n, 0]
+    return result, cont, e
 
 
 # Gaussian elimination with complete pivoting
@@ -139,11 +190,13 @@ def back_subst(m):
 
 if __name__ == "__main__":
 
-    a = [[14, 6, -2, 3],
+    '''a = [[14, 6, -2, 3],
          [3, 15, 2, -5],
          [-7, 4, -23, 2],
          [1, -3, -2, 16]]
-    b = [[12], [32], [-24], [14]]
+    b = [[12], [32], [-24], [14]]'''
+    a= [[3, -1, 1], [1, -8, -2], [1, 1, 5]]
+    b=[[-2], [1], [4]]
     # Para testing con pivoteo total
     '''a =[[1, 1, 1, 0, 0, 0],
         [4, 2, 1, 0, 0, 0],
@@ -152,4 +205,4 @@ if __name__ == "__main__":
         [4, 1, 0, -4, -1, 0],
         [2, 0, 0, 0, 0, 0]]
     b= [[141],   [112.7],  [112.7],  [125.63],   [0],     [0]]'''
-    ##################################################################3
+    # 3
