@@ -148,50 +148,59 @@ def lu_pp(a, b):
 
 # Jacobi
 def jacobi(a, b, x0, tol, nmax):
-    n = len(a)
-    d = np.diag(np.diag(a))
-    l = -(np.tril(a, -1))
-    u = -(np.triu(a, 1))
-    t = np.dot(np.linalg.inv(d), (l+u))
-    c = np.dot(np.linalg.inv(d), b)
+    if not is_dd(a):
+        raise Exception('The system does not converge')
+    else:
+        n = len(a)
+        d = np.diag(np.diag(a))
+        l = -(np.tril(a, -1))
+        u = -(np.triu(a, 1))
+        t = np.dot(np.linalg.inv(d), (l+u))
+        c = np.dot(np.linalg.inv(d), b)
 
-    xant = x0
-    e = 1000
-    cont = 0
-    rest_xact, res_cont, res_e = iterate(e, tol, cont, nmax, t, xant, c)
-    result = rest_xact[0:n, 0]
-    return result, res_cont, res_e
+        xant = x0
+        e = 1000
+        cont = 0
+        rest_xact, res_cont, res_e = iterate(e, tol, cont, nmax, t, xant, c)
+        result = rest_xact[0:n, 0]
+        return result, res_cont, res_e
 
 # Gauss-Seidel
 def gseidel(a, b, x0, tol, nmax):
-    n = len(a)
-    d = np.diag(np.diag(a))
-    l = -(np.tril(a))+d
-    u = -(np.triu(a))+d
-    t = np.dot(np.linalg.inv(d-l), u)
-    c = np.dot(np.linalg.inv(d-l), b)
-    xant = x0
-    e = 1000
-    cont = 0
-    rest_xact, res_cont, res_e = iterate(e, tol, cont, nmax, t, xant, c)
-    result = rest_xact[0:n, 0]
-    return result, res_cont, res_e
+     if not is_dd(a):
+        raise Exception('The system does not converge')
+     else:   
+        n = len(a)
+        d = np.diag(np.diag(a))
+        l = -(np.tril(a))+d
+        u = -(np.triu(a))+d
+        t = np.dot(np.linalg.inv(d-l), u)
+        c = np.dot(np.linalg.inv(d-l), b)
+        xant = x0
+        e = 1000
+        cont = 0
+        rest_xact, res_cont, res_e = iterate(e, tol, cont, nmax, t, xant, c)
+        result = rest_xact[0:n, 0]
+        return result, res_cont, res_e
 
 # SOR
 def sor(a, b, x0, w, tol, nmax):
-    n = len(a)
-    d = np.diag(np.diag(a))
-    l = -(np.tril(a))+d
-    u = -(np.triu(a))+d
+    if not is_dd(a):
+        raise Exception('The system does not converge')
+    else:
+        n = len(a)
+        d = np.diag(np.diag(a))
+        l = -(np.tril(a))+d
+        u = -(np.triu(a))+d
 
-    t = np.dot(np.linalg.inv(d-(w*l)), ((1-w)*d+w*u))
-    c = w*np.dot(np.linalg.inv(d-(w*l)), b)
-    xant = x0
-    e = 1000
-    cont = 0
-    rest_xact, res_cont, res_e = iterate(e, tol, cont, nmax, t, xant, c)
-    result = rest_xact[0:n, 0]
-    return result, res_cont, res_e
+        t = np.dot(np.linalg.inv(d-(w*l)), ((1-w)*d+w*u))
+        c = w*np.dot(np.linalg.inv(d-(w*l)), b)
+        xant = x0
+        e = 1000
+        cont = 0
+        rest_xact, res_cont, res_e = iterate(e, tol, cont, nmax, t, xant, c)
+        result = rest_xact[0:n, 0]
+        return result, res_cont, res_e
 
 # Auxiliar function for looping in iterative methods
 def iterate(e, tol, cont, nmax, t, xant, c):
@@ -225,6 +234,14 @@ def back_subst(m):
 
     return x
 
+def is_dd(a):
+    d = np.diag(np.abs(a))
+    s = np.sum(np.abs(a), axis=1) - d
+    if np.all(d > s):
+        return True
+    else:
+        return False
+
 def is_singular(a):
     if(np.linalg.det(a)):
         return False
@@ -246,9 +263,12 @@ if __name__ == "__main__":
     print(lu(a, b))
     a= [[3, -1, 1], [1, -8, -2], [1, 1, 5]]
     b=[[-2], [1], [4]]'''
-    a = [[1, 0, 0], [0, 1, 0], [0,0,1]]
-    b=[[-2], [1], [4]]
-    gauss_par(a, b)
+
+    '''a = [[1, 7, 3], [7, 4, 5], [3, 5, 0]]
+    b=[[-2], [1], [4]]'''
+    a= [[1, -8, -2], [1, 1, 5], [3, -1, 1]]
+    b = [[1], [4], [-2]]
+    gseidel(a, b, 0, 0.0001, 100)
 
     #print(jacobi(a, b, 0, 0.0001, 100))
     '''print(gseidel(a, b, 0, 0.0001, 100))
