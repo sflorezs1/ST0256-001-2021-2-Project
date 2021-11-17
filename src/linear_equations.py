@@ -1,11 +1,10 @@
 import numpy as np
-import sys
 
 # Simple Gaussian elimination
 def gauss(a, b):
     singular = is_singular(a)
     if singular:
-        sys.exit('The typed matrix is not invertible')
+        raise Exception('The typed matrix is not invertible')
     else:
         n = len(a)
         m = (np.c_[a, b]).astype(float)
@@ -15,7 +14,7 @@ def gauss(a, b):
                 if m[i, i] != 0:
                     m[j, i:n+1] = m[j, i:n+1]-(m[j, i]/m[i, i])*m[i, i:n+1]
                 else:
-                    sys.exit('Divide by zero')
+                    raise Exception('Divide by zero')
         x = back_subst(m)
     return x
 
@@ -23,7 +22,7 @@ def gauss(a, b):
 def gauss_tot(a, b):
     singular = is_singular(a)
     if singular:
-        sys.exit('The typed matrix is not invertible')
+        raise Exception('The typed matrix is not invertible')
     else:
         n = len(a)
         m = (np.c_[a, b]).astype(float)
@@ -47,7 +46,7 @@ def gauss_tot(a, b):
                 if m[i, i] != 0:
                     m[j, i:n+1] = m[j, i:n+1]-(m[j, i]/m[i, i])*m[i, i:n+1]
                 else:
-                    sys.exit('Divide by zero')
+                    raise Exception('Divide by zero')
         x = back_subst(m)
         size = len(order)-1
         for i in range(size, -1, -1):
@@ -56,12 +55,11 @@ def gauss_tot(a, b):
             x[order[i][1]] = aux
     return x
 
-
 # Gaussian elimination with parcial pivoting
 def gauss_par(a, b):
     singular = is_singular(a)
     if singular:
-        sys.exit('The typed matrix is not invertible')
+        raise Exception('The typed matrix is not invertible')
     else:
         n = len(a)
         m = (np.c_[a, b]).astype(float)
@@ -76,7 +74,7 @@ def gauss_par(a, b):
                 if m[j, i] != 0:
                     m[j, i:n+1] = m[j, i:n+1]-(m[j, i]/m[i, i])*m[i, i:n+1]
                 else:
-                    sys.exit('Divide by zero')
+                    raise Exception('Divide by zero')
         x = back_subst(m)
     return x
 
@@ -84,7 +82,7 @@ def gauss_par(a, b):
 def lu(a, b):
     singular = is_singular(a)
     if singular:
-        sys.exit('The typed matrix is not invertible')
+        raise Exception('The typed matrix is not invertible')
     else:
         n = len(a)
         l = np.eye(n)
@@ -97,7 +95,7 @@ def lu(a, b):
                     l[j, i] = m[j, i]/m[i, i]
                     m[j, i:n+1] = m[j, i:n+1]-(m[j, i]/m[i, i])*m[i, i:n+1]
                 else:
-                    sys.exit('Divide by zero')
+                    raise Exception('Divide by zero')
 
             u[i, i:n] = m[i, i:n]
             u[i, i:n] = m[i, i:n]
@@ -111,7 +109,7 @@ def lu(a, b):
 def lu_pp(a, b):
     singular = is_singular(a)
     if singular:
-        sys.exit('The typed matrix is not invertible')
+        raise Exception('The typed matrix is not invertible')
     else:
         n = len(a)
         l = np.eye(n)
@@ -138,7 +136,7 @@ def lu_pp(a, b):
                     l[j, i] = m[j, i]/m[i, i]
                     m[j, i:n+1] = m[j, i:n+1]-(m[j, i]/m[i, i])*m[i, i:n+1]
                 else:
-                    sys.exit('Divide by zero')
+                    raise Exception('Divide by zero')
 
             u[i, i:n] = m[i, i:n]
             u[i, i:n] = m[i, i:n]
@@ -147,7 +145,6 @@ def lu_pp(a, b):
         z = forw_subst(l, np.dot(p, b))
         x = back_subst((np.c_[u, z]).astype(float))
     return x
-
 
 # Jacobi
 def jacobi(a, b, x0, tol, nmax):
@@ -197,8 +194,6 @@ def sor(a, b, x0, w, tol, nmax):
     return result, res_cont, res_e
 
 # Auxiliar function for looping in iterative methods
-
-
 def iterate(e, tol, cont, nmax, t, xant, c):
     while e > tol and cont < nmax:
         xact = np.dot(t, xant)+c
@@ -218,7 +213,6 @@ def forw_subst(l, b):
 
     return z
 
-
 def back_subst(m):
     n = len(m)
     x = np.zeros(n)
@@ -231,13 +225,11 @@ def back_subst(m):
 
     return x
 
-
 def is_singular(a):
     if(np.linalg.det(a)):
         return False
     else:
         return True
-
 
 if __name__ == "__main__":
 
@@ -251,11 +243,14 @@ if __name__ == "__main__":
     print(gauss_par(a, b))
     print(gauss_tot(a, b))
     print(lu_pp(a, b))
-    print(lu(a, b))'''
+    print(lu(a, b))
     a= [[3, -1, 1], [1, -8, -2], [1, 1, 5]]
+    b=[[-2], [1], [4]]'''
+    a = [[1, 0, 0], [0, 1, 0], [0,0,1]]
     b=[[-2], [1], [4]]
+    gauss_par(a, b)
 
-    print(jacobi(a, b, 0, 0.0001, 100))
+    #print(jacobi(a, b, 0, 0.0001, 100))
     '''print(gseidel(a, b, 0, 0.0001, 100))
     print(sor(a, b, 0, 0.5, 0.0001, 100))'''
     # Para testing con pivoteo total
