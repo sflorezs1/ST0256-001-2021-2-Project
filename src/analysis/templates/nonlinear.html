@@ -1,0 +1,66 @@
+{% extends 'layouts.html'%} {%block content%}
+
+<div class="nonlinear">
+  <div class="container">
+    <div class="card">
+      <div class="card-header text-center"><h2>Non-Linear Equations</h2></div>
+        <div class="card-body">
+            <div class="list-group text-center">
+                <a href=""
+                    class="list-group-item list-group-item-action">
+                    Incremental Searches
+                </a>
+                <a href=""
+                    class="list-group-item list-group-item-action">
+                    Bisection
+                </a>
+                <a href=""
+                    class="list-group-item list-group-item-action">
+                    Fake Rule
+                </a>
+                <a href=""
+                    class="list-group-item list-group-item-action">
+                    Fixed Point
+                </a>
+                <a href=""
+                    class="list-group-item list-group-item-action">
+                    Newton Method
+                </a>
+                <a href=""
+                    class="list-group-item list-group-item-action">
+                    Secant Method
+                </a>
+                <a href=""
+                    class="list-group-item list-group-item-action">
+                    Multiple Roots
+                </a>
+            </div>
+        </div>
+      <!--
+      <div class="card-header">Insert an Equation</div>
+      <div class="card-body">
+        <form method="POST" action="">
+          {{form.hidden_tag('self')}}
+          <fieldset>
+            <div class="form-group">
+              {{form.eq.label(class="form-control-label")}} 
+              {%if form.eq.errors%} 
+              {{form.eq(class="form-control is-invalid")}}
+              {%for error in form.eq.errors%}
+              <span>{{error}}</span>
+              {%endfor%} 
+              {%else%} {{form.eq(class="form-control")}} 
+              {%endif%}
+            </div>
+          </fieldset>
+          <br />
+          <div class="field-group">
+            {{form.submit(class="btn btn-primary")}}
+          </div>
+        </form>
+      </div>
+    </div>
+    -->
+  </div>
+</div>
+{%endblock content%}
