@@ -4,12 +4,12 @@ import sys
 # Simple Gaussian elimination
 def gauss(a, b):
     singular = is_singular(a)
-    if singular:
-        sys.exit('The typed matrix is not invertible')
+    square = is_square(a, b)
+    if singular or not square:
+        raise Exception('The typed matrix is not invertible or is invalid')
     else:
         n = len(a)
         m = (np.c_[a, b]).astype(float)
-
         for i in range(n):
             for j in range(i+1, n):
                 if m[i, i] != 0:
@@ -22,8 +22,9 @@ def gauss(a, b):
 # Gaussian elimination with complete pivoting
 def gauss_tot(a, b):
     singular = is_singular(a)
-    if singular:
-        sys.exit('The typed matrix is not invertible')
+    square = is_square(a, b)
+    if singular or not square:
+        raise Exception('The typed matrix is not invertible or is invalid')
     else:
         n = len(a)
         m = (np.c_[a, b]).astype(float)
@@ -60,8 +61,9 @@ def gauss_tot(a, b):
 # Gaussian elimination with parcial pivoting
 def gauss_par(a, b):
     singular = is_singular(a)
-    if singular:
-        sys.exit('The typed matrix is not invertible')
+    square = is_square(a, b)
+    if singular or not square:
+        raise Exception('The typed matrix is not invertible or is invalid')
     else:
         n = len(a)
         auxn= n+1
@@ -85,8 +87,9 @@ def gauss_par(a, b):
 # LU factorization with SGE
 def lu(a, b):
     singular = is_singular(a)
-    if singular:
-        sys.exit('The typed matrix is not invertible')
+    square = is_square(a, b)
+    if singular or not square:
+        raise Exception('The typed matrix is not invertible or is invalid')
     else:
         n = len(a)
         l = np.eye(n)
@@ -113,8 +116,9 @@ def lu(a, b):
 # LU factorization with EGPP
 def lu_pp(a, b):
     singular = is_singular(a)
-    if singular:
-        sys.exit('The typed matrix is not invertible')
+    square = is_square(a, b)
+    if singular or not square:
+        raise Exception('The typed matrix is not invertible or is invalid')
     else:
         n = len(a)
         l = np.eye(n)
@@ -133,7 +137,7 @@ def lu_pp(a, b):
                 m[i, i:n] = aux1
                 p[i, :] = aux2
                 if i > 0:
-                    aux3 = l[i+aux, 0:i-1]
+                    aux3 = l[i+aux, 0:i].copy()
                     l[i+aux, 0:i] = l[i, 0:i]
                     l[i, 0:i] = aux3
             for j in range(i+1, n):
@@ -154,52 +158,64 @@ def lu_pp(a, b):
 
 # Jacobi
 def jacobi(a, b, x0, tol, nmax):
-    n = len(a)
-    d = np.diag(np.diag(a))
-    l = -(np.tril(a, -1))
-    u = -(np.triu(a, 1))
-    t = np.dot(np.linalg.inv(d), (l+u))
-    c = np.dot(np.linalg.inv(d), b)
+    square = is_square(a, b)
+    if not is_dd(a) or not square:
+        raise Exception('The system does not converge')
+    else:
+        n = len(a)
+        d = np.diag(np.diag(a))
+        l = -(np.tril(a, -1))
+        u = -(np.triu(a, 1))
+        t = np.dot(np.linalg.inv(d), (l+u))
+        c = np.dot(np.linalg.inv(d), b)
 
-    xant = x0
-    e = 1000
-    cont = 0
-    rest_xact, res_cont, res_e = iterate(e, tol, cont, nmax, t, xant, c)
-    result = rest_xact[0:n, 0]
-    return result, res_cont, res_e
+        xant = x0
+        e = 1000
+        cont = 0
+        rest_xact, res_cont, res_e = iterate(e, tol, cont, nmax, t, xant, c)
+        result = rest_xact[0:n, 0]
+        return result, res_cont, res_e
 
 
 # Gauss-Seidel
 def gseidel(a, b, x0, tol, nmax):
-    n = len(a)
-    d = np.diag(np.diag(a))
-    l = -(np.tril(a))+d
-    u = -(np.triu(a))+d
-    t = np.dot(np.linalg.inv(d-l), u)
-    c = np.dot(np.linalg.inv(d-l), b)
-    xant = x0
-    e = 1000
-    cont = 0
-    rest_xact, res_cont, res_e = iterate(e, tol, cont, nmax, t, xant, c)
-    result = rest_xact[0:n, 0]
-    return result, res_cont, res_e
+    square = is_square(a, b)
+    if not is_dd(a) or not square:
+        raise Exception('The system does not converge')
+    else:
+        n = len(a)
+        d = np.diag(np.diag(a))
+        l = -(np.tril(a))+d
+        u = -(np.triu(a))+d
+        t = np.dot(np.linalg.inv(d-l), u)
+        c = np.dot(np.linalg.inv(d-l), b)
+        xant = x0
+        e = 1000
+        cont = 0
+        rest_xact, res_cont, res_e = iterate(e, tol, cont, nmax, t, xant, c)
+        result = rest_xact[0:n, 0]
+        return result, res_cont, res_e
 
 
 # SOR
 def sor(a, b, x0, w, tol, nmax):
-    n = len(a)
-    d = np.diag(np.diag(a))
-    l = -(np.tril(a))+d
-    u = -(np.triu(a))+d
+    square = is_square(a, b)
+    if not is_dd(a) or not square:
+        raise Exception('The system does not converge')
+    else:
+        n = len(a)
+        d = np.diag(np.diag(a))
+        l = -(np.tril(a))+d
+        u = -(np.triu(a))+d
 
-    t = np.dot(np.linalg.inv(d-(w*l)), ((1-w)*d+w*u))
-    c = w*np.dot(np.linalg.inv(d-(w*l)), b)
-    xant = x0
-    e = 1000
-    cont = 0
-    rest_xact, res_cont, res_e = iterate(e, tol, cont, nmax, t, xant, c)
-    result = rest_xact[0:n, 0]
-    return result, res_cont, res_e
+        t = np.dot(np.linalg.inv(d-(w*l)), ((1-w)*d+w*u))
+        c = w*np.dot(np.linalg.inv(d-(w*l)), b)
+        xant = x0
+        e = 1000
+        cont = 0
+        rest_xact, res_cont, res_e = iterate(e, tol, cont, nmax, t, xant, c)
+        result = rest_xact[0:n, 0]
+        return result, res_cont, res_e
 
 
 # Auxiliar function for looping in iterative methods
@@ -241,42 +257,23 @@ def is_singular(a):
     else:
         return True
 
+def is_dd(a):
+    d = np.diag(np.abs(a))
+    s = np.sum(np.abs(a), axis=1) - d
+    if np.all(d > s):
+        return True
+    else:
+        return False
+
+def is_square(a, b):
+    if len(a)==len(a[0]):
+        if len(b) == len(a):
+            return True
+    else:
+        return False
 
 if __name__ == "__main__":
-
-    '''a = [[14, 6, -2, 3],
-         [3, 15, 2, -5],
-         [-7, 4, -23, 2],
-         [1, -3, -2, 16]]
-    b = [[12], [32], [-24], [14]]
-        
-    print(gauss(a, b))
-    print(gauss_par(a, b))
-    print(gauss_tot(a, b))
-    print(lu_pp(a, b))
-    print(lu(a, b))'''
-    a= [[3, -1, 1], [1, -8, -2], [1, 1, 5]]
-    b=[[-2], [1], [4]]
-
-    '''a = [[ 1, 1, 1 ],
-    [ 4, 2, 1],
-    [20.25, 4.5, 1]]
-    b= [[2.5], [5], [6.7]]'''
-    print(gauss_par(a, b))
-    print(lu_pp(a, b))
-    print(gauss(a, b))
-    #print(jacobi(a, b, 0, 0.0001, 100))
-    '''print(gseidel(a, b, 0, 0.0001, 100))
-    print(sor(a, b, 0, 0.5, 0.0001, 100))'''
-    # Para testing con pivoteo total
-    '''a =[[1, 1, 1, 0, 0, 0],
-        [4, 2, 1, 0, 0, 0],
-        [0, 0, 0, 4, 2, 1],
-        [0, 0, 0, 16, 4, 1],
-        [4, 1, 0, -4, -1, 0],
-        [2, 0, 0, 0, 0, 0]]
-    b= [[141],   [112.7],  [112.7],  [125.63],   [0],     [0]]'''
-
+    pass
 
 def linear_solve(A, b):
     m = [gauss, gauss_par, gauss_tot, lu, lu_pp, np.linalg.solve]
