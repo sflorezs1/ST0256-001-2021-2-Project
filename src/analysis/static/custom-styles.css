@@ -1,0 +1,23 @@
+.test{
+    display:block;
+    width:300px;
+    height:300px;
+    background: purple;
+}
+
+.nonlinear{
+    background: skyblue;
+}
+
+.linear{
+    background:plum;
+}
+
+.interpol{
+    background:tan;
+}
+
+.card-control{
+    width:50em;
+    height:50em;
+}
