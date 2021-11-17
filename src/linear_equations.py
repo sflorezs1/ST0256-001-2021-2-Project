@@ -64,16 +64,17 @@ def gauss_par(a, b):
         sys.exit('The typed matrix is not invertible')
     else:
         n = len(a)
+        auxn= n+1
         m = (np.c_[a, b]).astype(float)
         for i in range(n-1):
             # Rows
-            aux0, aux = abs(m[i+1:n, i]).max(), (abs(m[i+1:n, i]).argmax() + 1)
+            aux0, aux = abs(m[i+1:n, i]).max(), (abs(m[i+1:n, i]).argmax()+1)
             if(aux0 > abs(m[i, i])):
-                aux1 = m[i+aux, i:n]
-                m[aux+i, i:n] = m[i, i:n]
-                m[i, i:n] = aux1
+                aux1 = (m[i+aux, i:(auxn)]).copy()
+                m[aux+i, i:auxn] = m[i, i:auxn]
+                m[i, i:auxn] = aux1
             for j in range(i+1, n):
-                if m[j, i] != 0:
+                if m[i, i] != 0:
                     m[j, i:n+1] = m[j, i:n+1]-(m[j, i]/m[i, i])*m[i, i:n+1]
                 else:
                     sys.exit('Divide by zero')
@@ -123,8 +124,8 @@ def lu_pp(a, b):
             # Rows
             aux0, aux = abs(m[i+1:n, i]).max(), (abs(m[i+1:n, i]).argmax() + 1)
             if(aux0 > abs(m[i, i])):
-                aux1 = m[i+aux, i:n]
-                aux2 = p[i+aux, :]
+                aux1 = m[i+aux, i:n].copy()
+                aux2 = p[i+aux, :].copy()
                 m[aux+i, i:n] = m[i, i:n]
                 p[aux+i, :] = p[i, :]
                 m[i, i:n] = aux1
@@ -255,7 +256,14 @@ if __name__ == "__main__":
     a= [[3, -1, 1], [1, -8, -2], [1, 1, 5]]
     b=[[-2], [1], [4]]
 
-    print(jacobi(a, b, 0, 0.0001, 100))
+    '''a = [[ 1, 1, 1 ],
+    [ 4, 2, 1],
+    [20.25, 4.5, 1]]
+    b= [[2.5], [5], [6.7]]'''
+    print(gauss_par(a, b))
+    print(lu_pp(a, b))
+    print(gauss(a, b))
+    #print(jacobi(a, b, 0, 0.0001, 100))
     '''print(gseidel(a, b, 0, 0.0001, 100))
     print(sor(a, b, 0, 0.5, 0.0001, 100))'''
     # Para testing con pivoteo total
