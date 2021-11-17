@@ -15,7 +15,7 @@ def gauss(a, b):
                 if m[i, i] != 0:
                     m[j, i:n+1] = m[j, i:n+1]-(m[j, i]/m[i, i])*m[i, i:n+1]
                 else:
-                    sys.exit('Divide by zero')
+                    raise ZeroDivisionError()
         x = back_subst(m)
     return x
 
@@ -47,7 +47,7 @@ def gauss_tot(a, b):
                 if m[i, i] != 0:
                     m[j, i:n+1] = m[j, i:n+1]-(m[j, i]/m[i, i])*m[i, i:n+1]
                 else:
-                    sys.exit('Divide by zero')
+                    raise ZeroDivisionError()
         x = back_subst(m)
         size = len(order)-1
         for i in range(size, -1, -1):
@@ -76,9 +76,10 @@ def gauss_par(a, b):
                 if m[j, i] != 0:
                     m[j, i:n+1] = m[j, i:n+1]-(m[j, i]/m[i, i])*m[i, i:n+1]
                 else:
-                    sys.exit('Divide by zero')
+                    raise ZeroDivisionError()
         x = back_subst(m)
     return x
+
 
 # LU factorization with SGE
 def lu(a, b):
@@ -97,7 +98,7 @@ def lu(a, b):
                     l[j, i] = m[j, i]/m[i, i]
                     m[j, i:n+1] = m[j, i:n+1]-(m[j, i]/m[i, i])*m[i, i:n+1]
                 else:
-                    sys.exit('Divide by zero')
+                    raise ZeroDivisionError()
 
             u[i, i:n] = m[i, i:n]
             u[i, i:n] = m[i, i:n]
@@ -106,6 +107,7 @@ def lu(a, b):
         z = forw_subst(l, b)
         x = back_subst((np.c_[u, z]).astype(float))
     return x
+
 
 # LU factorization with EGPP
 def lu_pp(a, b):
@@ -138,7 +140,7 @@ def lu_pp(a, b):
                     l[j, i] = m[j, i]/m[i, i]
                     m[j, i:n+1] = m[j, i:n+1]-(m[j, i]/m[i, i])*m[i, i:n+1]
                 else:
-                    sys.exit('Divide by zero')
+                    raise ZeroDivisionError()
 
             u[i, i:n] = m[i, i:n]
             u[i, i:n] = m[i, i:n]
@@ -165,6 +167,7 @@ def jacobi(a, b, x0, tol, nmax):
     result = rest_xact[0:n, 0]
     return result, res_cont, res_e
 
+
 # Gauss-Seidel
 def gseidel(a, b, x0, tol, nmax):
     n = len(a)
@@ -179,6 +182,7 @@ def gseidel(a, b, x0, tol, nmax):
     rest_xact, res_cont, res_e = iterate(e, tol, cont, nmax, t, xant, c)
     result = rest_xact[0:n, 0]
     return result, res_cont, res_e
+
 
 # SOR
 def sor(a, b, x0, w, tol, nmax):
@@ -196,9 +200,8 @@ def sor(a, b, x0, w, tol, nmax):
     result = rest_xact[0:n, 0]
     return result, res_cont, res_e
 
+
 # Auxiliar function for looping in iterative methods
-
-
 def iterate(e, tol, cont, nmax, t, xant, c):
     while e > tol and cont < nmax:
         xact = np.dot(t, xant)+c
@@ -228,7 +231,6 @@ def back_subst(m):
         for j in range(i+1, n):
             x[i] = x[i] - m[i, j]*x[j]
         x[i] = x[i]/m[i, i]
-
     return x
 
 
@@ -266,3 +268,14 @@ if __name__ == "__main__":
         [4, 1, 0, -4, -1, 0],
         [2, 0, 0, 0, 0, 0]]
     b= [[141],   [112.7],  [112.7],  [125.63],   [0],     [0]]'''
+
+
+def linear_solve(A, b):
+    m = [gauss, gauss_par, gauss_tot, lu, lu_pp, np.linalg.solve]
+
+    for f in m:
+        try:
+            sol = f(A, b)
+            return sol
+        except Exception:
+            pass
