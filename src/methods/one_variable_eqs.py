@@ -6,9 +6,10 @@ from sympy import symbols
 
 def continuity_check(f: Callable[[float], Any], x0, x1):
     x = symbols('x')
+    interval_check = Interval(x0, x1)
     interval = continuous_domain(f(x), x, Interval(x0, x1))
     if isinstance(interval, Interval):
-        return interval.is_left_unbounded and interval.is_right_unbounded
+        return interval == interval_check
     else:
         return False
 
@@ -60,7 +61,7 @@ def bisection(f: Callable[[float], float], a: float, b: float, tol: float, n_max
         f_mp = f(mp)
         E = abs(mp - p0)
         i += 1
-
+    # mp = guess, i = iterations, E = error
     return mp, i, E
 
 
@@ -87,7 +88,8 @@ def fake_rule(f: Callable[[float], float], a: float, b: float, tol: float, n_max
         E = abs(mp - p0)
         i += 1
 
-    return mp, E, i
+    # mp = guess, i = iterations, E = error
+    return mp, i, E
 
 
 def fixed_point(g: Callable[[float], float], x0: float, tol: float, n_max: int) -> Tuple[float, int, float]:
@@ -101,6 +103,7 @@ def fixed_point(g: Callable[[float], float], x0: float, tol: float, n_max: int) 
         i += 1
         x_prev = x_curr
 
+    # x_prev = guess, i = iterations, E = error
     return x_prev, i, E
 
 
@@ -121,6 +124,7 @@ def newton(f: Callable[[float], float], df: Callable[[float], float], x0: float,
         x_prev = x_curr
         f_prev = f_curr
 
+    # x_prev = guess, i = iterations, E = error
     return x_prev, i, E
 
 
@@ -140,6 +144,7 @@ def secant(f: Callable[[float], float], x0: float, x1: float, tol: float, n_max:
         f1 = f_curr
         i += 1
 
+    # x1 = guess, i = iterations, E = error
     return x1, i, E
 
 
@@ -158,6 +163,7 @@ def multiple_roots(f: Callable[[float], float], df: Callable[[float], float], d2
         x_prev = x_curr
         f_prev = f_curr
 
+    # x_prev = guess, i = iterations, E = error
     return x_prev, i, E
 
 

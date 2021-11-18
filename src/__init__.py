@@ -2,4 +2,4 @@ from flask import Flask
 app = Flask(__name__)
 
 app.config['SECRET_KEY']='firstflaskapp'
-from analysis import routes
+import routes

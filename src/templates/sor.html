@@ -1,0 +1,80 @@
+{% extends 'layouts.html'%}
+
+{%block content%}
+
+<div class="card-header">Insert System to Solve</div>
+<div class="card-body">
+  <form method="POST" action="">
+    {{form.hidden_tag('self')}}
+    <fieldset>
+      <div class="form-group">
+        {{ form.csrf_token }}
+        {{form.a.label(class="form-control-label")}} 
+        {%if form.a.errors%} 
+        {{form.a(class="form-control is-invalid")}}
+        {%for error in form.a.errors%}
+        <span>{{error}}</span>
+        <br>
+        {%endfor%} 
+        {%else%} {{form.a(class="form-control")}} 
+        {%endif%}
+        {{form.b.label(class="form-control-label")}} 
+        {%if form.b.errors%} 
+        {{form.b(class="form-control is-invalid")}}
+        {%for error in form.b.errors%}
+        <span>{{error}}</span>
+        <br>
+        {%endfor%} 
+        {%else%} {{form.b(class="form-control")}} 
+        {%endif%}
+
+        {{form.x0.label(class="form-control-label")}} 
+        {%if form.x0.errors%} 
+        {{form.x0(class="form-control is-invalid")}}
+        {%for error in form.x0.errors%}
+        <span>{{error}}</span>
+        <br>
+        {%endfor%} 
+        {%else%} {{form.x0(class="form-control")}} 
+        {%endif%}
+
+        {{form.w.label(class="form-control-label")}} 
+        {%if form.w.errors%} 
+        {{form.w(class="form-control is-invalid")}}
+        {%for error in form.w.errors%}
+        <span>{{error}}</span>
+        <br>
+        {%endfor%} 
+        {%else%} {{form.w(class="form-control")}} 
+        {%endif%}
+
+        {{form.tol.label(class="form-control-label")}} 
+        {%if form.tol.errors%} 
+        {{form.tol(class="form-control is-invalid")}}
+        {%for error in form.tol.errors%}
+        <span>{{error}}</span>
+        <br>
+        {%endfor%} 
+        {%else%} {{form.tol(class="form-control")}} 
+        {%endif%}
+
+        {{form.n_max.label(class="form-control-label")}} 
+        {%if form.n_max.errors%} 
+        {{form.n_max(class="form-control is-invalid")}}
+        {%for error in form.n_max.errors%}
+        <span>{{error}}</span>
+        <br>
+        {%endfor%} 
+        {%else%} {{form.n_max(class="form-control")}} 
+        {%endif%}
+      </div>
+    </fieldset>
+    <br />
+    <div class="field-group">
+      {{form.submit(class="btn btn-primary")}}
+    </div>
+  </form>
+</div>
+</div>
+
+{%endblock content%}

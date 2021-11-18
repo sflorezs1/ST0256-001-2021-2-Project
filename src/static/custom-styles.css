@@ -1,0 +1,27 @@
+.main-menu {
+    background: lightgreen;
+}
+
+.nonlinear {
+    background: skyblue;
+}
+
+.linear {
+    background:plum;
+}
+
+.interpol {
+    background:tan;
+}
+
+.card-control{
+    width:50em;
+    height:50em;
+}
+
+img.graph {
+    max-width: 750px;
+    min-width: 750px;
+    max-height: auto;
+    min-width: auto;
+}

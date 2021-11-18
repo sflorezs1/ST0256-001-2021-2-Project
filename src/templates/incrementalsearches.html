@@ -1,0 +1,76 @@
+{% extends 'layouts.html'%}
+
+{%block content%}
+<div class="d-flex flex-row justify-content-around">
+  <div class="card mx-5 w-50">
+    <div class="card-header">Insert an Equation</div>
+    <div class="card-body">
+      <form method="POST" action="">
+        {{form.hidden_tag('self')}}
+        <fieldset>
+          <div class="form-group">
+            {{ form.csrf_token }}
+            {{form.eq.label(class="form-control-label")}}
+            {%if form.eq.errors%}
+            {{form.eq(class="form-control is-invalid")}}
+            {%for error in form.eq.errors%}
+            <span>{{error}}</span>
+            <br>
+            {%endfor%}
+            {%else%} {{form.eq(class="form-control")}}
+            {%endif%}
+
+            {{form.x0.label(class="form-control-label")}}
+            {%if form.x0.errors%}
+            {{form.x0(class="form-control is-invalid")}}
+            {%for error in form.x0.errors%}
+            <span>{{error}}</span>
+            <br>
+            {%endfor%}
+            {%else%} {{form.x0(class="form-control")}}
+            {%endif%}
+
+            {{form.h.label(class="form-control-label")}}
+            {%if form.h.errors%}
+            {{form.h(class="form-control is-invalid")}}
+            {%for error in form.h.errors%}
+            <span>{{error}}</span>
+            <br>
+            {%endfor%}
+            {%else%} {{form.h(class="form-control")}}
+            {%endif%}
+
+            {{form.n_max.label(class="form-control-label")}}
+            {%if form.n_max.errors%}
+            {{form.n_max(class="form-control is-invalid")}}
+            {%for error in form.n_max.errors%}
+            <span>{{error}}</span>
+            <br>
+            {%endfor%}
+            {%else%} {{form.n_max(class="form-control")}}
+            {%endif%}
+          </div>
+        </fieldset>
+        <br/>
+        <div class="field-group">
+          {{form.submit(class="btn btn-primary")}}
+        </div>
+      </form>
+    </div>
+  </div>
+  {% if result |length >0 %}
+  <div class="card mx-5 w-50">
+    <div class="card-header">Result</div>
+    <div class="card-body">
+      <ul class="list-group">
+        
+        <li class="list-group-item"><span class="fw-bold">Resulting interval: </span>[{{ result['x0'] }}, {{
+          result['xf'] }}]</li>
+        <li class="list-group-item"><span class="fw-bold">Iterations: </span>[{{ result['iter'] }}]</li>
+      </ul>
+      <img class="card-img-bottom graph" src="data:image/png;base64,{{ result['img'] }}">
+    </div>
+  </div>
+  {% endif %}
+</div>
+{%endblock content%}

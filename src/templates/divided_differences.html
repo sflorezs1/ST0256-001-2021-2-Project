@@ -1,0 +1,40 @@
+{% extends 'layouts.html'%}
+
+{%block content%}
+
+<div class="card-header">Insert System to Solve</div>
+<div class="card-body">
+  <form method="POST" action="">
+    {{form.hidden_tag('self')}}
+    <fieldset>
+      <div class="form-group">
+        {{ form.csrf_token }}
+        {{form.x.label(class="form-control-label")}} 
+        {%if form.x.errors%} 
+        {{form.x(class="form-control is-invalid")}}
+        {%for error in form.x.errors%}
+        <span>{{error}}</span>
+        {%endfor%} 
+        {%else%} {{form.x(class="form-control")}} 
+        {%endif%}
+        <br>
+        {{form.y.label(class="form-control-label")}} 
+        {%if form.y.errors%} 
+        {{form.y(class="form-control is-invalid")}}
+        {%for error in form.y.errors%}
+        <span>{{error}}</span>
+        {%endfor%} 
+        {%else%} {{form.y(class="form-control")}} 
+        {%endif%}
+
+      </div>
+    </fieldset>
+    <br />
+    <div class="field-group">
+      {{form.submit(class="btn btn-primary")}}
+    </div>
+  </form>
+</div>
+</div>
+
+{%endblock content%}
