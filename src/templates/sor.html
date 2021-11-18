@@ -1,7 +1,9 @@
 {% extends 'layouts.html'%}
 
 {%block content%}
-
+{%include 'util.html'%}
+<div class="d-flex flex-row justify-content-around">
+  <div class="card mx-5 w-50">
 <div class="card-header">Insert System to Solve</div>
 <div class="card-body">
   <form method="POST" action="">
@@ -75,6 +77,25 @@
     </div>
   </form>
 </div>
+</div>
+{% if result |length >0 %}
+<div class="card mx-5 w-50">
+  <div class="card-header">Result</div>
+  <div class="card-body">
+    <ul class="list-group">
+      <li class="list-group-item">
+          {% for i in range(result['x']|length) %}
+            <div class="mx-1">
+              $$x_{{i}} = {{result['x'][i]}}$$
+            </div>
+          {% endfor %}
+      </li>
+      <li class="list-group-item"><span class="fw-bold">Error </span>{{ result['error'] }}</li>
+      <li class="list-group-item"><span class="fw-bold">Iterations: </span>[{{ result['iter'] }}]</li>
+    </ul>
+  </div>
+</div>
+{% endif %}
 </div>
 
 {%endblock content%}

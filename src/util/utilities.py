@@ -35,3 +35,52 @@ def _create_figure(eq: Callable[[float], float], interval: Tuple[float, float], 
 
 def domain(x, y):
     return min(x, y), max(x, y)
+
+
+import numpy as np
+
+def parse_num(x: str):
+    try:
+        res = float(x)
+    except ValueError:
+        div = x.index('/')
+        a = float(x[0:div])
+        b = float(x[div + 1:])
+        res = a / b
+    return res
+
+def parse_matrix(x: str):
+    x = x.replace(' ', '')
+    stack = []
+    mat = []
+    i = 0
+    paren = 0
+    while i < len(x):
+        if x[i] == '{':
+            paren += 1
+            stack.append(paren)
+            i += 1
+        elif x[i] == '}':
+            if stack.pop() != paren:
+                raise Exception(f'UnevenBracesError: expression "{x}" at position {i}')
+            else:
+                paren -= 1
+                i += 1
+        elif x[i].isdigit() or x[i] in "-.":
+            endpos = x.index('}', i - 1)
+            array = x[i: endpos].split(',')
+            mat.append([parse_num(a) for a in array])
+            i = endpos + 2
+        else:
+          raise Exception(f'UnrecognizedCaracterError: "{x[i]}" at {i}')
+    return np.array(mat)
+
+def parse_vector(x: str):
+    try:
+        if x[0] != '{' or x[-1] != '}':
+            raise Exception('Invalid vector format')
+        x = x[1:-1].replace(' ', '').split(',')
+        res = [parse_num(a) for a in x]
+        return np.array(res)
+    except ValueError:
+        raise Exception('Invalid vector format')

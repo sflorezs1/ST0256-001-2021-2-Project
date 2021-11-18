@@ -1,5 +1,5 @@
 from sympy import *
-import linear_equations
+from methods import linear_equations
 import numpy as np
 from enum import Enum
 from sympy.utilities.lambdify import lambdify

@@ -1,12 +1,14 @@
 from flask.json import dump
-from sympy import sympify, lambdify
+from sympy import sympify, lambdify, latex
 from sympy.core.symbol import symbols
 from sympy.utilities.lambdify import lambdify
 from __init__ import app
 from flask import render_template, url_for, redirect
 from forms import *
-from util.utilities import plot_png, domain
+from util.utilities import plot_png, domain, parse_matrix, parse_matrix
 from methods.one_variable_eqs import *
+from methods.linear_equations import *
+from methods.interpolation import interpolate, Method
 
 x_sym = symbols('x')
 
@@ -41,16 +43,19 @@ def incsearch():
     form = IncrementalSearchesForm()
     data = {}
     if form.validate_on_submit():
-        eq = (lambda a: lambdify(x_sym, form.eq.data)(a))
-        x0 = form.x0.data
-        h = form.h.data
-        n_max = form.n_max.data
-        result = incremental_searches(eq, x0, h, n_max)
-        img = plot_png(eq, (x0 - 10, x0 + h * n_max), [result[0], result[1]])
-        data['img'] = img
-        data['x0'] = result[0]
-        data['xf'] = result[1]
-        data['iter'] = result[2]
+        try:
+            eq = (lambda a: lambdify(x_sym, form.eq.data)(a))
+            x0 = form.x0.data
+            h = form.h.data
+            n_max = form.n_max.data
+            result = incremental_searches(eq, x0, h, n_max)
+            img = plot_png(eq, (x0 - 10, x0 + h * n_max), [result[0], result[1]])
+            data['img'] = img
+            data['x0'] = result[0]
+            data['xf'] = result[1]
+            data['iter'] = result[2]
+        except Exception as e:
+            data['fail'] = str(e)
         
     return render_template('incrementalsearches.html', title="Incremental Searches", color_class="nonlinear", form=form, result=data)
 
@@ -59,18 +64,21 @@ def bisect():
     form = BisectionForm()
     data = {}
     if form.validate_on_submit():
-        eq = (lambda a: lambdify(x_sym, form.eq.data)(a))
-        a = form.a.data
-        b = form.b.data
-        tol = form.tol.data
-        n_max = form.n_max.data
-        result = bisection(eq, a, b, tol, n_max)
-        # plot_png: function, interval (a, b), points to draw
-        img = plot_png(eq, (a - 10, b + 10), [result[0]])
-        data['img'] = img
-        data['x'] = result[0]
-        data['iter'] = result[1]
-        data['error'] = result[2]
+        try:
+            eq = (lambda a: lambdify(x_sym, form.eq.data)(a))
+            a = form.a.data
+            b = form.b.data
+            tol = form.tol.data
+            n_max = form.n_max.data
+            result = bisection(eq, a, b, tol, n_max)
+            # plot_png: function, interval (a, b), points to draw
+            img = plot_png(eq, (a - 10, b + 10), [result[0]])
+            data['img'] = img
+            data['x'] = result[0]
+            data['iter'] = result[1]
+            data['error'] = result[2]
+        except Exception as e:
+            data['fail'] = str(e)
     return render_template('bisection.html', title="Bisection", color_class="nonlinear",form=form, result=data)
 
 @app.route('/fakerule', methods=['GET', 'POST'])
@@ -78,18 +86,21 @@ def frule():
     data = {}
     form = FakeRuleForm()
     if form.validate_on_submit():
-        eq = (lambda a: lambdify(x_sym, form.eq.data)(a))
-        a = form.a.data
-        b = form.b.data
-        tol = form.tol.data
-        n_max = form.n_max.data
-        result = fake_rule(eq, a, b, tol, n_max)
-        # plot_png: function, interval (a, b), points to draw
-        img = plot_png(eq, (a - 10, b + 10), [result[0]])
-        data['img'] = img
-        data['x'] = result[0]
-        data['iter'] = result[1]
-        data['error'] = result[2]
+        try:
+            eq = (lambda a: lambdify(x_sym, form.eq.data)(a))
+            a = form.a.data
+            b = form.b.data
+            tol = form.tol.data
+            n_max = form.n_max.data
+            result = fake_rule(eq, a, b, tol, n_max)
+            # plot_png: function, interval (a, b), points to draw
+            img = plot_png(eq, (a - 10, b + 10), [result[0]])
+            data['img'] = img
+            data['x'] = result[0]
+            data['iter'] = result[1]
+            data['error'] = result[2]
+        except Exception as e:
+            data['fail'] = str(e)
     return render_template('fakerule.html', title="Fake Rule", color_class="nonlinear",form=form,result=data)
 
 @app.route('/fixedpoint', methods=['GET', 'POST'])
@@ -97,17 +108,20 @@ def fpoint():
     data = {}
     form = FixedPointForm()
     if form.validate_on_submit():
-        eq = (lambda a: lambdify(x_sym, form.eq.data)(a))
-        x0 = form.x0.data
-        tol = form.tol.data
-        n_max = form.n_max.data
-        result = fixed_point(eq, x0, tol, n_max)
-        # plot_png: function, interval (a, b), points to draw
-        img = plot_png(eq, (x0 - 10, result[0] + 10), [result[0]])
-        data['img'] = img
-        data['x'] = result[0]
-        data['iter'] = result[1]
-        data['error'] = result[2]
+        try:
+            eq = (lambda a: lambdify(x_sym, form.eq.data)(a))
+            x0 = form.x0.data
+            tol = form.tol.data
+            n_max = form.n_max.data
+            result = fixed_point(eq, x0, tol, n_max)
+            # plot_png: function, interval (a, b), points to draw
+            img = plot_png(eq, (x0 - 10, result[0] + 10), [result[0]])
+            data['img'] = img
+            data['x'] = result[0]
+            data['iter'] = result[1]
+            data['error'] = result[2]
+        except Exception as e:
+            data['fail'] = str(e)
     return render_template('fixedpoint.html', title="Fixed Point", color_class="nonlinear",form=form,result=data)
 
 @app.route('/newton', methods=['GET', 'POST'])
@@ -115,18 +129,21 @@ def newt():
     data = {}
     form = NewtonForm()
     if form.validate_on_submit():
-        eq = (lambda a: lambdify(x_sym, form.eq.data)(a))
-        deq = (lambda a: lambdify(x_sym, form.deq.data)(a))
-        x0 = form.x0.data
-        tol = form.tol.data
-        n_max = form.n_max.data
-        result = newton(eq, deq, x0, tol, n_max)
-        # plot_png: function, interval (a, b), points to draw
-        img = plot_png(eq, domain(x0 - 10, result[0] + 10), [result[0]])
-        data['img'] = img
-        data['x'] = result[0]
-        data['iter'] = result[1]
-        data['error'] = result[2]
+        try:
+            eq = (lambda a: lambdify(x_sym, form.eq.data)(a))
+            deq = (lambda a: lambdify(x_sym, form.deq.data)(a))
+            x0 = form.x0.data
+            tol = form.tol.data
+            n_max = form.n_max.data
+            result = newton(eq, deq, x0, tol, n_max)
+            # plot_png: function, interval (a, b), points to draw
+            img = plot_png(eq, domain(x0 - 10, result[0] + 10), [result[0]])
+            data['img'] = img
+            data['x'] = result[0]
+            data['iter'] = result[1]
+            data['error'] = result[2]
+        except Exception as e:
+            data['fail'] = str(e)
     return render_template('newton.html', title="Newton Method", color_class="nonlinear",form=form,result=data)
     
 @app.route('/secant', methods=['GET', 'POST'])
@@ -134,18 +151,21 @@ def sec():
     data = {}
     form = SecantForm()
     if form.validate_on_submit():
-        eq = (lambda a: lambdify(x_sym, form.eq.data)(a))
-        x0 = form.x0.data
-        x1 = form.x1.data
-        tol = form.tol.data
-        n_max = form.n_max.data
-        result = secant(eq, x0, x1, tol, n_max)
-        # plot_png: function, interval (a, b), points to draw
-        img = plot_png(eq, (x0 - 10, x1 + 10), [result[0]])
-        data['img'] = img
-        data['x'] = result[0]
-        data['iter'] = result[1]
-        data['error'] = result[2]
+        try:
+            eq = (lambda a: lambdify(x_sym, form.eq.data)(a))
+            x0 = form.x0.data
+            x1 = form.x1.data
+            tol = form.tol.data
+            n_max = form.n_max.data
+            result = secant(eq, x0, x1, tol, n_max)
+            # plot_png: function, interval (a, b), points to draw
+            img = plot_png(eq, (x0 - 10, x1 + 10), [result[0]])
+            data['img'] = img
+            data['x'] = result[0]
+            data['iter'] = result[1]
+            data['error'] = result[2]
+        except Exception as e:
+            data['fail'] = str(e)
     return render_template('secant.html', title="Secant Method", color_class="nonlinear",form=form,result=data)
 
 @app.route('/mroots', methods=['GET', 'POST'])
@@ -174,51 +194,135 @@ def mroots():
 #Linear Methods
 
 @app.route('/gauss', methods=['GET', 'POST'])
-def gauss():
+def r_gauss():
     data = {}
     form = GaussForm()
+    if form.validate_on_submit():
+        try:
+            a = parse_matrix(form.a.data)
+            b = parse_matrix(form.b.data)
+            print(a)
+            result = gauss(a,b)
+            print(result)
+            data['x'] = result
+        except Exception as e:
+            data['fail'] = str(e)
+        
     return render_template('gauss.html', title="Gauss Elimination", color_class="linear",form=form,result=data)
 
 @app.route('/gauss_tot', methods=['GET', 'POST'])
-def gauss_tot():
+def r_gauss_tot():
     data = {}
     form = GaussTotForm()
+    if form.validate_on_submit():
+        try:
+            a = parse_matrix(form.a.data)
+            b = parse_matrix(form.b.data)
+            result = gauss_tot(a,b)
+            data['x'] = result
+        except Exception as e:
+            data['fail'] = str(e)
     return render_template('gauss_tot.html', title="Gauss Elimination (Total Pivoting)", color_class="linear",form=form,result=data)
 
 @app.route('/gauss_par', methods=['GET', 'POST'])
-def gauss_par():
+def r_gauss_par():
     data = {}
     form = GaussParForm()
+    if form.validate_on_submit():
+        try:
+            a = parse_matrix(form.a.data)
+            b = parse_matrix(form.b.data)
+            result = gauss_par(a,b)
+            data['x'] = result
+        except Exception as e:
+            data['fail'] = str(e)
     return render_template('gauss_par.html', title="Gauss Elimination (Partial Pivoting)", color_class="linear",form=form,result=data)
 
 @app.route('/lu', methods=['GET', 'POST'])
-def lu():
+def r_lu():
     data = {}
     form = LUForm()
+    if form.validate_on_submit():
+        try:
+            a = parse_matrix(form.a.data)
+            b = parse_matrix(form.b.data)
+            result = lu(a,b)
+            data['x'] = result
+        except Exception as e:
+            data['fail'] = str(e)
     return render_template('lu.html', title="LU Factorization", color_class="linear",form=form,result=data)
 
 @app.route('/lu_pp', methods=['GET', 'POST'])
-def lu_pp():
+def r_lu_pp():
     data = {}
     form = LUPPForm()
+    if form.validate_on_submit():
+        try:
+            a = parse_matrix(form.a.data)
+            b = parse_matrix(form.b.data)
+            result = lu_pp(a,b)
+            data['x'] = result
+        except Exception as e:
+            data['fail'] = str(e)
     return render_template('lu_pp.html', title="LU Factorization (Partial Pivoting)", color_class="linear",form=form,result=data)
 
 @app.route('/jacobi', methods=['GET', 'POST'])
-def jacobi():
+def r_jacobi():
     data = {}
     form = JacobiForm()
+    if form.validate_on_submit():
+        try:
+            a = parse_matrix(form.a.data)
+            b = parse_matrix(form.b.data)
+            x0 = form.x0.data
+            tol = form.tol.data
+            nmax = form.n_max.data
+            print(a, b, x0, tol, nmax)
+            result = jacobi(a,b,x0,tol,nmax)
+            data['x'] = result[0]
+            data['iter'] = result[1]
+            data['error'] = result[2]
+        except Exception as e:
+            data['fail'] = str(e)
     return render_template('jacobi.html', title="Jacobi Method", color_class="linear",form=form,result=data)
 
 @app.route('/gseidel', methods=['GET', 'POST'])
-def gseidel():
+def r_gseidel():
     data = {}
     form = GSeidelForm()
+    if form.validate_on_submit():
+        try:
+            a = parse_matrix(form.a.data)
+            b = parse_matrix(form.b.data)
+            x0 = form.x0.data
+            tol = form.tol.data
+            nmax = form.n_max.data
+            result = gseidel(a,b,x0,tol,nmax)
+            data['x'] = result[0]
+            data['iter'] = result[1]
+            data['error'] = result[2]
+        except Exception as e:
+            data['fail'] = str(e)
     return render_template('gseidel.html', title="Gauss-Seidel Method", color_class="linear",form=form,result=data)
 
 @app.route('/sor', methods=['GET', 'POST'])
-def sor():
+def r_sor():
     data = {}
     form = SORForm()
+    if form.validate_on_submit():
+        try:
+            a = parse_matrix(form.a.data)
+            b = parse_matrix(form.b.data)
+            x0 = form.x0.data
+            w= form.w.data
+            tol = form.tol.data
+            nmax = form.n_max.data
+            result = sor(a,b,x0,w,tol,nmax)
+            data['x'] = result[0]
+            data['iter'] = result[1]
+            data['error'] = result[2]
+        except Exception as e:
+            data['fail'] = str(e)
     return render_template('sor.html', title="Successive Over-Relaxation", color_class="linear",form=form,result=data)
 
 #Interpolation Methods
@@ -226,6 +330,18 @@ def sor():
 @app.route('/div_dif', methods=['GET', 'POST'])
 def div_dif():
     data = {}
+    form = DivDifForm()
+    if form.validate_on_submit():
+        try:
+            x = parse_matrix(form.x.data)
+            y = parse_matrix(form.y.data)
+            val = form.val.data
+            result = interpolate(Method.DividedDifferences, x,y)
+            data['p'] = result[0](val)
+            data['expr'] = latex(result[1])
+            data['img'] = plot_png(result[0], )
+        except Exception as e:
+            data['fail'] = str(e)
     form = DivDifForm()
     return render_template('divided_differences.html', title="Divided Differences", color_class="interpol",form=form,result=data)
 
