@@ -75,18 +75,23 @@ Sample valid input for each method and its result.
 ## Linear equations
 In linear section, you can solve problems through the following methods:
 
+
+
 ### Syntax
 - A matrix: must be typed as {{1, 2, 3}, {4, 5, 6}, {1, 9, 2}}
 - B vector:  must be typed as {{23}, {2}, {0}} (since its a column vector)
 {{3,-1,1},{1,-8,2}, {1,1,5}}
 {{-2},{4},{1}}
+
 ### Direct methods
 Direct methods contains Simple Gaussian Elimination, Gaussian Elimination with parcial and total pivoting, LU factorization with Simple Gaussian Elimination and Gaussian Elimination with parcial pivoting.
 
 Sample valid input for these methods and its result (since they have the same input).
 
+![dm](./images/dm.png)
+
 ### Iterative methods
-Iterative methods contains Jacobi, Gauss Seidel and sor.
+Iterative methods contains Jacobi, Gauss Seidel and SOR.
 
 Sample valid input for these methods and its result (since they have the same input).
 
