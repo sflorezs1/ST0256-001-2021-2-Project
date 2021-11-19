@@ -45,19 +45,19 @@ Let's suppose we have the following function *2x² + 4*, then, the correct way t
 [^2]: note you must provide the multiplicator symbol
 
 ### Methods to find initial aproximation
-This method contains *incremental searches*.
+This classification contains *incremental searches*.
 Sample valid input for this method and its result
 
 ![is](./images/is.png)
 
 ### Interval methods
-This method contains *bisection* and *fake rule*.
+This classification contains *bisection* and *fake rule*.
 Sample valid input for both methods and its result (since both have the same input)
 
 ![bi-fr](./images/bi.png)
 
 ### Open methods
-This method contains *fixed point*, *Newton*, *secant*, and *multiple roots*. 
+This classification contains *fixed point*, *Newton*, *secant*, and *multiple roots*. 
 Sample valid input for each method and its result.
 
 **Fixed point**
@@ -75,7 +75,7 @@ Sample valid input for each method and its result.
 ## Linear equations
 In linear section, you can solve problems through the following methods:
 
-
+![le](./images/le.png)
 
 ### Syntax
 - A matrix: must be typed as {{1, 2, 3}, {4, 5, 6}, {1, 9, 2}}
@@ -84,14 +84,14 @@ In linear section, you can solve problems through the following methods:
 {{-2},{4},{1}}
 
 ### Direct methods
-Direct methods contains Simple Gaussian Elimination, Gaussian Elimination with parcial and total pivoting, LU factorization with Simple Gaussian Elimination and Gaussian Elimination with parcial pivoting.
+This classification contains Simple Gaussian Elimination, Gaussian Elimination with parcial and total pivoting, LU factorization with Simple Gaussian Elimination and Gaussian Elimination with parcial pivoting.
 
 Sample valid input for these methods and its result (since they have the same input).
 
 ![dm](./images/dm.png)
 
 ### Iterative methods
-Iterative methods contains Jacobi, Gauss Seidel and SOR.
+This classification contains Jacobi, Gauss Seidel and SOR.
 
 Sample valid input for these methods and its result (since they have the same input).
 
@@ -100,19 +100,23 @@ Sample valid input for these methods and its result (since they have the same in
 ## Interpolation
 In non-linear section, you can solve problems through the following methods
 
-![nle](./images/nle.png)
+![in](./images/in.png)
 
 ### Syntax
 - X vector: x values of each point written as {x1, x2, x3}
 - Y vector: y values of each point written as {y1, y2, y3}
 
 ### Interpolation methods
-Interpolation methods contains Vandermonde, Divided Differences, Lagrange, Linear Splines, Quadratic Splines
+This classification contains Vandermonde, Divided Differences, Lagrange, Linear Splines, Quadratic Splines
 
 Sample valid input for these methods and its result (since they have the same input)
 
-## Team Members  
+![vand](./images/vand.png)
+
+---
+author:
 - Adrián Alberto Gutiérrez Leal  
 - Santiago Hidalgo Ocampo  
 - Manuela Herrera López  
 - Simón Flórez Silva  
+---
