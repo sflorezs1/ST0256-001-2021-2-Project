@@ -1,17 +1,14 @@
-from flask.json import dump
-from sympy import sympify, lambdify, latex
-from sympy.core.symbol import symbols
-from sympy.utilities.lambdify import lambdify
+import traceback
 from __init__ import app
-from flask import render_template, url_for, redirect
+from flask import render_template
 from forms import *
 from util.utilities import plot_png, domain, parse_matrix, parse_vector
 from methods.one_variable_eqs import *
 from methods.linear_equations import *
 from methods.interpolation import *
+from sympy import *
 
 x_sym = symbols('x')
-
 
 @app.route('/')
 @app.route('/home', methods=['GET'])
@@ -37,14 +34,14 @@ def nonlinear():
     return render_template('nonlinear.html', title="Non-Linear Equations", color_class="nonlinear")
 
 #Non-Linear Methods
-
 @app.route('/incrementalsearches', methods=['GET', 'POST'])
 def incsearch():
     form = IncrementalSearchesForm()
     data = {}
     if form.validate_on_submit():
         try:
-            eq = (lambda a: lambdify(x_sym, form.eq.data)(a))
+            eq = lambda a: lambdify(x_sym, sympify(form.eq.data))(a)
+            print(form.eq.data)
             x0 = form.x0.data
             h = form.h.data
             n_max = form.n_max.data
@@ -55,6 +52,7 @@ def incsearch():
             data['xf'] = result[1]
             data['iter'] = result[2]
         except Exception as e:
+            print(traceback.format_exc())
             data['fail'] = str(e)
         
     return render_template('incrementalsearches.html', title="Incremental Searches", color_class="nonlinear", form=form, result=data)

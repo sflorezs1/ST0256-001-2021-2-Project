@@ -1,8 +1,6 @@
-from sympy import *
+from sympy import symbols, lambdify, simplify, Piecewise
 from methods import linear_equations
 import numpy as np
-from enum import Enum
-from sympy.utilities.lambdify import lambdify
 
 
 def interpolate(method, X, Y):
@@ -169,6 +167,7 @@ def quadratic_spline(X, Y):
     ycol = np.array(ypartial).T
 
     sol = linear_equations.linear_solve(A, ycol)
+    sol = sol.round(decimals=9)
 
     eqs = []
     idx = 0

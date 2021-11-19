@@ -25,3 +25,7 @@ img.graph {
     max-height: auto;
     min-width: auto;
 }
+
+.MathJax {
+    font-size: 1em;
+}

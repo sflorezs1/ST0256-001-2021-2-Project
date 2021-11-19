@@ -6,8 +6,6 @@ from matplotlib.figure import Figure
 import numpy as np
 import base64
 
-from numpy.lib.arraysetops import isin
-
 def plot_png(eq: Callable[[float], float], interval: Tuple[float, float], points: List[int]):
     fig = _create_figure(eq, interval, points)
     output = io.BytesIO()
@@ -32,10 +30,13 @@ def _create_figure(eq: Callable[[float], float], interval: Tuple[float, float], 
     axis.plot(xs, ys)
     axis.margins(0)
     for p in points:
-        if isinstance(p, tuple):
+        if type(p) is tuple:
+            print(isinstance(p, tuple))
             axis.plot(p[0], p[1], 'ro')
+            axis.text(p[0], p[1], f'({round(p[0], 2)}, {round(p[1], 2)})')
         else:
             axis.plot(p, 0, 'ro')
+            axis.text(round(p, 2), 0, f'{p}')
     return fig
 
 def domain(x, y):
