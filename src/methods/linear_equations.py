@@ -16,7 +16,7 @@ def gauss(a, b):
                 else:
                     raise ZeroDivisionError()
         x = back_subst(m)
-    return x
+        return x
 
 # Gaussian elimination with complete pivoting
 def gauss_tot(a, b):
@@ -54,7 +54,7 @@ def gauss_tot(a, b):
             aux = x[order[i][0]]
             x[order[i][0]] = x[order[i][1]]
             x[order[i][1]] = aux
-    return x
+        return x
 
 
 # Gaussian elimination with parcial pivoting
@@ -80,7 +80,7 @@ def gauss_par(a, b):
                 else:
                     raise ZeroDivisionError()
         x = back_subst(m)
-    return x
+        return x
 
 
 # LU factorization with SGE
@@ -109,7 +109,7 @@ def lu(a, b):
 
         z = forw_subst(l, b)
         x = back_subst((np.c_[u, z]).astype(float))
-    return x
+        return x
 
 
 # LU factorization with EGPP
@@ -152,11 +152,11 @@ def lu_pp(a, b):
 
         z = forw_subst(l, np.dot(p, b))
         x = back_subst((np.c_[u, z]).astype(float))
-    return x
+        return x
 
 
 # Jacobi
-def jacobi(a, b, x0, tol, nmax):
+def gjacobi(a, b, x0, tol, nmax):
     square = is_square(a, b)
     if not is_dd(a) or not square:
         raise Exception('The system does not converge')

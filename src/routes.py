@@ -276,7 +276,7 @@ def r_jacobi():
             tol = form.tol.data
             nmax = form.n_max.data
             print(a, b, x0, tol, nmax)
-            result = jacobi(a,b,x0,tol,nmax)
+            result = gjacobi(a,b,x0,tol,nmax)
             data['x'] = result[0]
             data['iter'] = result[1]
             data['error'] = result[2]
