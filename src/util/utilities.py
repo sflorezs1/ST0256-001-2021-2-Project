@@ -6,6 +6,8 @@ from matplotlib.figure import Figure
 import numpy as np
 import base64
 
+from numpy.lib.arraysetops import isin
+
 def plot_png(eq: Callable[[float], float], interval: Tuple[float, float], points: List[int], ratio = 1):
     fig = _create_figure(eq, interval, points, ratio)
     output = io.BytesIO()
@@ -30,7 +32,10 @@ def _create_figure(eq: Callable[[float], float], interval: Tuple[float, float], 
     axis.plot(xs, ys)
     axis.margins(0)
     for p in points:
-      axis.plot(p, 0, 'ro')
+        if isinstance(p, tuple):
+            axis.plot(p[0], p[1], 'ro')
+        else:
+            axis.plot(p, 0, 'ro')
     return fig
 
 def domain(x, y):
@@ -62,7 +67,7 @@ def parse_matrix(x: str):
             i += 1
         elif x[i] == '}':
             if stack.pop() != paren:
-                raise Exception(f'UnevenBracesError: expression "{x}" at position {i}')
+                raise Exception(f'Uneven Braces: expression "{x}" at position {i}')
             else:
                 paren -= 1
                 i += 1
@@ -72,7 +77,7 @@ def parse_matrix(x: str):
             mat.append([parse_num(a) for a in array])
             i = endpos + 2
         else:
-          raise Exception(f'UnrecognizedCaracterError: "{x[i]}" at {i}')
+          raise Exception(f'Unrecognized Character: "{x[i]}" at {i}')
     return np.array(mat)
 
 def parse_vector(x: str):
@@ -81,6 +86,7 @@ def parse_vector(x: str):
             raise Exception('Invalid vector format')
         x = x[1:-1].replace(' ', '').split(',')
         res = [parse_num(a) for a in x]
-        return np.array(res)
+        print(res)
+        return res
     except ValueError:
         raise Exception('Invalid vector format')

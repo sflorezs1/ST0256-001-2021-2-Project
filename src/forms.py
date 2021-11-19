@@ -124,33 +124,8 @@ class SORForm(FlaskForm):
     submit = SubmitField(label='Go!')
 
 #Interpolation
-
-class VandermondeForm(FlaskForm):
+class InterpolForm(FlaskForm):
     x = StringField(label='Vector X', validators=[InputRequired()])
     y = StringField(label='Vector Y', validators=[InputRequired()])
-    val = StringField(label='Value to Interpolate', validators=[InputRequired()])
-    submit = SubmitField(label='Go!')
-
-class DivDifForm(FlaskForm):
-    x = StringField(label='Vector X', validators=[InputRequired()])
-    y = StringField(label='Vector Y', validators=[InputRequired()])
-    val = StringField(label='Value to Interpolate', validators=[InputRequired()])
-    submit = SubmitField(label='Go!')
-
-class LagrangeForm(FlaskForm):
-    x = StringField(label='Vector X', validators=[InputRequired()])
-    y = StringField(label='Vector Y', validators=[InputRequired()])
-    val = StringField(label='Value to Interpolate', validators=[InputRequired()])
-    submit = SubmitField(label='Go!')
-
-class LinearSplineForm(FlaskForm):
-    x = StringField(label='Vector X', validators=[InputRequired()])
-    y = StringField(label='Vector Y', validators=[InputRequired()])
-    val = StringField(label='Value to Interpolate', validators=[InputRequired()])
-    submit = SubmitField(label='Go!')
-
-class QuadraticSplineForm(FlaskForm):
-    x = StringField(label='Vector X', validators=[InputRequired()])
-    y = StringField(label='Vector Y', validators=[InputRequired()])
-    val = StringField(label='Value to Interpolate', validators=[InputRequired()])
+    val = FloatField(label='Value to Interpolate', validators=[InputRequired()])
     submit = SubmitField(label='Go!')

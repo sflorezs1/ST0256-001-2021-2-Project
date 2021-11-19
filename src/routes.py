@@ -5,10 +5,10 @@ from sympy.utilities.lambdify import lambdify
 from __init__ import app
 from flask import render_template, url_for, redirect
 from forms import *
-from util.utilities import plot_png, domain, parse_matrix, parse_matrix
+from util.utilities import plot_png, domain, parse_matrix, parse_vector
 from methods.one_variable_eqs import *
 from methods.linear_equations import *
-from methods.interpolation import interpolate, Method
+from methods.interpolation import *
 
 x_sym = symbols('x')
 
@@ -326,45 +326,112 @@ def r_sor():
     return render_template('sor.html', title="Successive Over-Relaxation", color_class="linear",form=form,result=data)
 
 #Interpolation Methods
-
-@app.route('/div_dif', methods=['GET', 'POST'])
-def div_dif():
+@app.route('/interpol/<method>', methods=['GET', 'POST'])
+def r_interpol(method):
     data = {}
-    form = DivDifForm()
+    form = InterpolForm()
     if form.validate_on_submit():
         try:
-            x = parse_matrix(form.x.data)
-            y = parse_matrix(form.y.data)
+            x = parse_vector(form.x.data)
+            y = parse_vector(form.y.data)
             val = form.val.data
-            result = interpolate(Method.DividedDifferences, x,y)
+            result = interpolate(method, x, y)
             data['p'] = result[0](val)
+            data['val'] = val
             data['expr'] = latex(result[1])
-            data['img'] = plot_png(result[0], )
+            points = list(zip(x,y))
+            points.append((val, data['p']))
+            data['img'] = plot_png(result[0], (min(val, min(x)) - 10, max(val, max(x)) + 10), points)
         except Exception as e:
+            import traceback
+            traceback.print_exc()
             data['fail'] = str(e)
-    form = DivDifForm()
-    return render_template('divided_differences.html', title="Divided Differences", color_class="interpol",form=form,result=data)
+    return render_template('interpolate.html', title=method, color_class="interpol",form=form,result=data)
 
 @app.route('/lagrange', methods=['GET', 'POST'])
 def lagrange():
     data = {}
-    form = LagrangeForm()
-    return render_template('lagrange.html', title="Lagrange Polynomial", color_class="interpol",form=form,result=data)
+    form = InterpolForm()
+    if form.validate_on_submit():
+        try:
+            x = parse_vector(form.x.data)
+            y = parse_vector(form.y.data)
+            val = form.val.data
+            result = divided_differences(x, y)
+            data['p'] = result[0](val)
+            data['val'] = val
+            data['expr'] = latex(result[1])
+            points = list(zip(x,y))
+            points.append((val, data['p']))
+            data['img'] = plot_png(result[0], (min(val, min(x)) - 10, max(val, max(x)) + 10), points)
+        except Exception as e:
+            import traceback
+            traceback.print_exc()
+            data['fail'] = str(e)
+    return render_template('interpolate.html', title="Lagrange Polynomial", color_class="interpol",form=form,result=data)
 
 @app.route('/linear_spline', methods=['GET', 'POST'])
 def linear_spline():
     data = {}
-    form = LinearSplineForm()
-    return render_template('linear_spline.html', title="Linear Spline", color_class="interpol",form=form,result=data)
+    form = InterpolForm()
+    if form.validate_on_submit():
+        try:
+            x = parse_vector(form.x.data)
+            y = parse_vector(form.y.data)
+            val = form.val.data
+            result = divided_differences(x, y)
+            data['p'] = result[0](val)
+            data['val'] = val
+            data['expr'] = latex(result[1])
+            points = list(zip(x,y))
+            points.append((val, data['p']))
+            data['img'] = plot_png(result[0], (min(val, min(x)) - 10, max(val, max(x)) + 10), points)
+        except Exception as e:
+            import traceback
+            traceback.print_exc()
+            data['fail'] = str(e)
+    return render_template('interpolate.html', title="Linear Spline", color_class="interpol",form=form,result=data)
 
 @app.route('/quadratic_spline', methods=['GET', 'POST'])
 def quadratic_spline():
     data = {}
-    form = QuadraticSplineForm()
-    return render_template('quadratic_spline.html', title="Quadratic Spline", color_class="interpol",form=form,result=data)
+    form = InterpolForm()
+    if form.validate_on_submit():
+        try:
+            x = parse_vector(form.x.data)
+            y = parse_vector(form.y.data)
+            val = form.val.data
+            result = divided_differences(x, y)
+            data['p'] = result[0](val)
+            data['val'] = val
+            data['expr'] = latex(result[1])
+            points = list(zip(x,y))
+            points.append((val, data['p']))
+            data['img'] = plot_png(result[0], (min(val, min(x)) - 10, max(val, max(x)) + 10), points)
+        except Exception as e:
+            import traceback
+            traceback.print_exc()
+            data['fail'] = str(e)
+    return render_template('interpolate.html', title="Quadratic Spline", color_class="interpol",form=form,result=data)
 
 @app.route('/vandermonde', methods=['GET', 'POST'])
 def vandermonde():
     data = {}
-    form = VandermondeForm()
-    return render_template('vandermonde.html', title="Quadratic Spline", color_class="interpol",form=form,result=data)
+    form = InterpolForm()
+    if form.validate_on_submit():
+        try:
+            x = parse_vector(form.x.data)
+            y = parse_vector(form.y.data)
+            val = form.val.data
+            result = divided_differences(x, y)
+            data['p'] = result[0](val)
+            data['val'] = val
+            data['expr'] = latex(result[1])
+            points = list(zip(x,y))
+            points.append((val, data['p']))
+            data['img'] = plot_png(result[0], (min(val, min(x)) - 10, max(val, max(x)) + 10), points)
+        except Exception as e:
+            import traceback
+            traceback.print_exc()
+            data['fail'] = str(e)
+    return render_template('interpolate.html', title="Vandermonde", color_class="interpol",form=form,result=data)

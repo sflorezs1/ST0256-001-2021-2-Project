@@ -271,11 +271,6 @@ def is_square(a, b):
     else:
         return False
 
-if __name__ == "__main__":
-    a= [[3, -1, 1], [1, -8, -2], [1, 1, 5]]
-    b=[[-2], [4], [1]]
-    print(jacobi(a,b,0, 0.000005, 1000))
-
 def linear_solve(A, b):
     m = [gauss, gauss_par, gauss_tot, lu, lu_pp, np.linalg.solve]
 

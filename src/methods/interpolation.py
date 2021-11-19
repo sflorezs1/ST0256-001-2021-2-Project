@@ -5,15 +5,7 @@ from enum import Enum
 from sympy.utilities.lambdify import lambdify
 
 
-class Method(Enum):
-    Vandermonde = 0
-    DividedDifferences = 1
-    Lagrange = 2
-    LinearSpline = 3
-    QuadraticSpline = 4
-
-
-def interpolate(method: Method, X, Y):
+def interpolate(method, X, Y):
     # validate X, Y and sort
 
     if len(Y) != len(X):
@@ -24,21 +16,22 @@ def interpolate(method: Method, X, Y):
 
     X, Y = zip(*sorted(zip(X, Y)))
 
-    if method == Method.Vandermonde:
-        return _vandermonde(X, Y)
-    elif method == Method.DividedDifferences:
-        return _divided_differences(X, Y)
-    elif method == Method.Lagrange:
-        return _lagrange(X, Y)
-    elif method == Method.LinearSpline:
-        return _linear_spline(X, Y)
-    elif method == Method.QuadraticSpline:
-        return _quadratic_spline(X, Y)
+    if method == 'Vandermonde':
+        return vandermonde(X, Y)
+    elif method == 'Divided Differences':
+        return divided_differences(X, Y)
+    elif method == 'Lagrange':
+        return lagrange(X, Y)
+    elif method == 'Linear Spline':
+        return linear_spline(X, Y)
+    elif method == 'Quadratic Spline':
+        return quadratic_spline(X, Y)
     else:
         raise Exception(f'Method {method} does not exist')
 
 
-def _vandermonde(X, Y):
+def vandermonde(X, Y):
+    print('Using Vandermonde')
     vandermonde_matrix = []
     for i in range(0, len(X)):
         auxList = []
@@ -58,10 +51,11 @@ def _vandermonde(X, Y):
         expr += i * x ** exp
         exp -= 1
 
-    return (lambda a: lambdify(x, expr)(a).item()), expr
+    return (lambda a: lambdify(x, expr)(a)), simplify(expr)
 
 
-def _divided_differences(X, Y):
+def divided_differences(X, Y):
+    print('Using Divided Differences')
     matrix_div_diff = []
     matrix_div_diff.append(Y)
     rest = 0
@@ -87,10 +81,11 @@ def _divided_differences(X, Y):
             prod *= (x - X[j])
 
         expr += coeff * prod
-    return (lambda a: lambdify(x, expr)(a).item()), expr
+    return (lambda a: lambdify(x, expr)(a)), simplify(expr)
 
 
-def _lagrange(X, Y):
+def lagrange(X, Y):
+    print('Using Lagrange')
     def L(i, x):
         p = 1
         for j in range(0, len(X)):
@@ -104,10 +99,11 @@ def _lagrange(X, Y):
     for i in range(len(Y)):
         expr += L(i, x) * Y[i]
 
-    return (lambda a: lambdify(x, expr)(a).item()), expr
+    return (lambda a: lambdify(x, expr)(a)), simplify(expr)
 
 
-def _linear_spline(X, Y):
+def linear_spline(X, Y):
+    print('Using Linear Spline')
     x = symbols('x')
 
     X, Y = zip(*sorted(zip(X, Y)))
@@ -128,11 +124,11 @@ def _linear_spline(X, Y):
     def piecewise(xpred):
         return lambdify(x, expr)(xpred).item()
 
-    return piecewise, expr
+    return piecewise, simplify(expr)
 
 
-def _quadratic_spline(X, Y):
-    conditions = []
+def quadratic_spline(X, Y):
+    print('Using Quadratic Spline')
     A = []
     # Basic equations
     for i in range(0, len(X) - 1):
@@ -188,39 +184,4 @@ def _quadratic_spline(X, Y):
         from sympy.utilities.lambdify import lambdify, implemented_function
         return (lambdify(x, expr)(xpred).item())
 
-    return piecewise, expr
-
-
-if __name__ == '__main__':
-    ######### Examples ##########
-    x = [-2, -1, 0, 1]
-    y = [12.1353, 6.3679, 1, -3.2817]
-
-    x = [1, 1.2, 1.4, 1.6, 1.8, 2]
-    y = [0.6747, 0.8491, 1.1214, 1.4921, 1.9607, 2.5258]
-
-    print(simplify(interpolate(Method.DividedDifferences, x, y)[1]))
-    print(simplify(interpolate(Method.Vandermonde, x, y)[1]))
-    print(simplify(interpolate(Method.Lagrange, x, y)[1]))
-    print(simplify(interpolate(Method.LinearSpline, x, y)[1]))
-    print(simplify(interpolate(Method.QuadraticSpline, x, y)[1]))
-
-    x = [-1, 1, 2, 4]
-    y = [7, -1, -8, 2]
-    # p = lagrange(x, y)
-    # print(asPolynomial(p))
-
-    ##### Linear Splines
-    x = [3, -2, 1, 4]
-    y = [1, 5, 1, 2]
-    # print(linearSplines(x, y)[1])
-
-    ####### Quadratic splines
-    # x = [1, 2, 4]
-    # y= [141, 112.7, 125.63]
-
-    # x = [2, 3, 5, 8, 6]
-    # y = [3.2, 4.8, 2.9, 12.4, 9.1]
-
-    # print(quadraticSplines(x, y)[0](8))
-    # print(len(list(set(x))) != len(x))
+    return piecewise, simplify(expr)
