@@ -8,8 +8,8 @@ import base64
 
 from numpy.lib.arraysetops import isin
 
-def plot_png(eq: Callable[[float], float], interval: Tuple[float, float], points: List[int], ratio = 1):
-    fig = _create_figure(eq, interval, points, ratio)
+def plot_png(eq: Callable[[float], float], interval: Tuple[float, float], points: List[int]):
+    fig = _create_figure(eq, interval, points)
     output = io.BytesIO()
     FigureCanvas(fig).print_png(output, dpi=300)
     output.seek(0)
@@ -17,16 +17,16 @@ def plot_png(eq: Callable[[float], float], interval: Tuple[float, float], points
     img = base64.b64encode(buffer).decode("utf-8").replace("\n", "")
     return img
 
-def _create_figure(eq: Callable[[float], float], interval: Tuple[float, float], points, ratio = 1):
-    res = abs(int((interval[1] - interval[0]) * ratio))
-    if res > 1000:
-        res = 1000
+def _create_figure(eq: Callable[[float], float], interval: Tuple[float, float], points):
+    print(interval)
+    res = 1000
     fig = Figure()
     axis = fig.add_subplot(1, 1, 1)
     axis.spines['left'].set_position('zero')
     axis.spines['right'].set_color('none')
     axis.spines['bottom'].set_position('zero')
     axis.spines['top'].set_color('none')
+    axis.set_xlim(interval)
     xs = np.linspace(interval[0], interval[1], res)
     ys = [eq(x) for x in xs]
     axis.plot(xs, ys)
