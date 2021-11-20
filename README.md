@@ -43,6 +43,10 @@ In non-linear section, you can solve problems through the following methods
 - arctan
 - arccos
 - arcsin
+- sqrt
+- cosh
+- sinh
+- tanh
 
 ### Syntax
 - Let's suppose we have the following function *2x² + 4*, then, the correct way to rewrite it is *2 * x^2 + 4*[^2]
