@@ -3,7 +3,6 @@ from sympy.calculus.util import continuous_domain
 from sympy.sets import Interval
 from sympy import symbols
 
-
 def continuity_check(f: Callable[[float], Any], x0, x1):
     x = symbols('x')
     interval_check = Interval(x0, x1)
