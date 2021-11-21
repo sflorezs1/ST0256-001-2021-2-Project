@@ -4,14 +4,15 @@ from flask_wtf import FlaskForm
 from wtforms import StringField,FloatField,IntegerField,SubmitField,DecimalField
 from wtforms.validators import InputRequired, ValidationError
 from sympy import *
+from util.utilities import lambda_parser
 
 x = symbols('x')
 
 def _validate_eq(form, field):
         try:
-            sympify(field.data)
+            lambda_parser.parse(field.data)
         except SympifyError as se:
-            raise ValidationError(f'{se}')
+            raise ValidationError("Invalid expression")
 
 # Non-Linear Methods
 

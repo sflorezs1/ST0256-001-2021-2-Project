@@ -1,12 +1,11 @@
 import io
-from typing import Callable, List, Tuple
-from flask import Response
 from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
 from matplotlib.figure import Figure
 import numpy as np
 import base64
+from sympy import *
 
-def plot_png(eq: Callable[[float], float], interval: Tuple[float, float], points: List[int]):
+def plot_png(eq, interval, points):
     fig = _create_figure(eq, interval, points)
     output = io.BytesIO()
     FigureCanvas(fig).print_png(output, dpi=300)
@@ -15,8 +14,7 @@ def plot_png(eq: Callable[[float], float], interval: Tuple[float, float], points
     img = base64.b64encode(buffer).decode("utf-8").replace("\n", "")
     return img
 
-def _create_figure(eq: Callable[[float], float], interval: Tuple[float, float], points):
-    print(interval)
+def _create_figure(eq, interval, points):
     res = 1000
     fig = Figure()
     axis = fig.add_subplot(1, 1, 1)
@@ -25,13 +23,27 @@ def _create_figure(eq: Callable[[float], float], interval: Tuple[float, float], 
     axis.spines['bottom'].set_position('zero')
     axis.spines['top'].set_color('none')
     axis.set_xlim(interval)
-    xs = np.linspace(interval[0], interval[1], res)
-    ys = [eq(x) for x in xs]
-    axis.plot(xs, ys)
-    axis.margins(0)
+    try:
+        xs = np.linspace(interval[0], interval[1], res)
+        ys = [eq(x) for x in xs]
+        axis.plot(xs, ys)
+        axis.margins(0)
+    except TypeError:
+        fig.delaxes(axis)
+        interval[0] += 10
+        interval[1] -= 10
+        axis = fig.add_subplot(1, 1, 1)
+        axis.spines['left'].set_position('zero')
+        axis.spines['right'].set_color('none')
+        axis.spines['bottom'].set_position('zero')
+        axis.spines['top'].set_color('none')
+        axis.set_xlim(interval)
+        xs = np.linspace(interval[0], interval[1], res)
+        ys = [eq(x) for x in xs]
+        axis.plot(xs, ys)
+        axis.margins(0)       
     for p in points:
         if type(p) is tuple:
-            print(isinstance(p, tuple))
             axis.plot(p[0], p[1], 'ro')
             axis.text(p[0], p[1], f'({round(p[0], 2)}, {round(p[1], 2)})')
         else:
@@ -40,7 +52,7 @@ def _create_figure(eq: Callable[[float], float], interval: Tuple[float, float], 
     return fig
 
 def domain(x, y):
-    return min(x, y), max(x, y)
+    return [min(x, y), max(x, y)]
 
 
 import numpy as np
@@ -87,7 +99,43 @@ def parse_vector(x: str):
             raise Exception('Invalid vector format')
         x = x[1:-1].replace(' ', '').split(',')
         res = [parse_num(a) for a in x]
-        print(res)
         return res
     except ValueError:
         raise Exception('Invalid vector format')
+
+class FunctionParser():
+    x_symbol = symbols('x')
+    # allowed identifiers
+    whitelist = ['sqrt', 'cos', 'sin', 'tan', 'arccos', 'arcsin', 'arctan',
+                 'cosh', 'sinh', 'tanh', 'x', 'pi', 'exp', 'log']
+    skip = [' ', '(', '*', '^', '/']
+
+    def parse(self, x: str):
+        # allowed functions
+        from math import sqrt, cos, sin, tan, acos as arccos, \
+                                asin as arcsin, atan as arctan, cosh, \
+                                sinh, tanh, pi, exp, log
+        idx_0 = -1
+        i = 0   # idx for ref string
+        digit_l = False
+        while i < len(x):
+            char = x[i]
+            if char.isalpha():
+                if idx_0 == -1:
+                    idx_0 = i
+                i += 1
+            elif not char.isalpha():
+                if idx_0 != -1:
+                    identifier = x[idx_0: i]
+                    if identifier not in self.whitelist:
+                        raise Exception(f'Unrecognized identifier "{identifier}" at position {idx_0}!')
+                    idx_0 = -1
+                i += 1
+            elif (char in self.skip) or char.isdigit():
+                i += 1
+            else:
+                raise Exception(f'Unrecognized character "{char}" at position {i}!')
+
+        return lambdify(self.x_symbol, sympify(x, locals={'x': self.x_symbol}), modules='sympy')
+
+lambda_parser = FunctionParser()

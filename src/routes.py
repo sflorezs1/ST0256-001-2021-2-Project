@@ -2,13 +2,14 @@ import traceback
 from __init__ import app
 from flask import render_template
 from forms import *
-from util.utilities import plot_png, domain, parse_matrix, parse_vector
+from util.utilities import plot_png, domain, parse_matrix, parse_vector, lambda_parser
 from methods.one_variable_eqs import *
 from methods.linear_equations import *
 from methods.interpolation import *
 from sympy import *
 
 x_sym = symbols('x')
+
 
 @app.route('/')
 @app.route('/home', methods=['GET'])
@@ -40,13 +41,12 @@ def incsearch():
     data = {}
     if form.validate_on_submit():
         try:
-            eq = lambda a: lambdify(x_sym, sympify(form.eq.data))(a)
-            print(form.eq.data)
+            eq = lambda_parser.parse(form.eq.data)
             x0 = form.x0.data
             h = form.h.data
             n_max = form.n_max.data
             result = incremental_searches(eq, x0, h, n_max)
-            img = plot_png(eq, (x0 - 10, x0 + h * n_max), [result[0], result[1]])
+            img = plot_png(eq, [x0 - 10, x0 + h * n_max], [result[0], result[1]])
             data['img'] = img
             data['x0'] = result[0]
             data['xf'] = result[1]
@@ -63,14 +63,13 @@ def bisect():
     data = {}
     if form.validate_on_submit():
         try:
-            eq = (lambda a: lambdify(x_sym, form.eq.data)(a))
+            eq = lambda_parser.parse(form.eq.data)
             a = form.a.data
-            b = form.b.data
+            b = form.b.data 
             tol = form.tol.data
             n_max = form.n_max.data
             result = bisection(eq, a, b, tol, n_max)
-            # plot_png: function, interval (a, b), points to draw
-            img = plot_png(eq, (a - 10, b + 10), [result[0]])
+            img = plot_png(eq, [a - 10, b + 10], [result[0]])
             data['img'] = img
             data['x'] = result[0]
             data['iter'] = result[1]
@@ -85,14 +84,14 @@ def frule():
     form = FakeRuleForm()
     if form.validate_on_submit():
         try:
-            eq = (lambda a: lambdify(x_sym, form.eq.data)(a))
+            eq = lambda_parser.parse(form.eq.data)
             a = form.a.data
             b = form.b.data
             tol = form.tol.data
             n_max = form.n_max.data
             result = fake_rule(eq, a, b, tol, n_max)
             # plot_png: function, interval (a, b), points to draw
-            img = plot_png(eq, (a - 10, b + 10), [result[0]])
+            img = plot_png(eq, [a - 10, b + 10], [result[0]])
             data['img'] = img
             data['x'] = result[0]
             data['iter'] = result[1]
@@ -107,13 +106,13 @@ def fpoint():
     form = FixedPointForm()
     if form.validate_on_submit():
         try:
-            eq = (lambda a: lambdify(x_sym, form.eq.data)(a))
+            eq = lambda_parser.parse(form.eq.data)
             x0 = form.x0.data
             tol = form.tol.data
             n_max = form.n_max.data
             result = fixed_point(eq, x0, tol, n_max)
             # plot_png: function, interval (a, b), points to draw
-            img = plot_png(eq, (x0 - 10, result[0] + 10), [result[0]])
+            img = plot_png(eq, [x0 - 10, result[0] + 10], [result[0]])
             data['img'] = img
             data['x'] = result[0]
             data['iter'] = result[1]
@@ -128,8 +127,8 @@ def newt():
     form = NewtonForm()
     if form.validate_on_submit():
         try:
-            eq = (lambda a: lambdify(x_sym, form.eq.data)(a))
-            deq = (lambda a: lambdify(x_sym, form.deq.data)(a))
+            eq = lambda_parser.parse(form.eq.data)
+            deq = lambda_parser.parse(form.deq.data)
             x0 = form.x0.data
             tol = form.tol.data
             n_max = form.n_max.data
@@ -150,14 +149,14 @@ def sec():
     form = SecantForm()
     if form.validate_on_submit():
         try:
-            eq = (lambda a: lambdify(x_sym, form.eq.data)(a))
+            eq = lambda_parser.parse(form.eq.data)
             x0 = form.x0.data
             x1 = form.x1.data
             tol = form.tol.data
             n_max = form.n_max.data
             result = secant(eq, x0, x1, tol, n_max)
             # plot_png: function, interval (a, b), points to draw
-            img = plot_png(eq, (x0 - 10, x1 + 10), [result[0]])
+            img = plot_png(eq, [x0 - 10, x1 + 10], [result[0]])
             data['img'] = img
             data['x'] = result[0]
             data['iter'] = result[1]
@@ -171,9 +170,9 @@ def mroots():
     data = {}
     form = MultipleRootsForm()
     if form.validate_on_submit():
-        eq = (lambda a: lambdify(x_sym, form.eq.data)(a))
-        deq = (lambda a: lambdify(x_sym, form.deq.data)(a))
-        d2eq = (lambda a: lambdify(x_sym, form.d2eq.data)(a))
+        eq = lambda_parser.parse(form.eq.data)
+        deq = lambda_parser.parse(form.deq.data)
+        d2eq = lambda_parser.parse(form.d2eq.data)
         x0 = form.x0.data
         tol = form.tol.data
         n_max = form.n_max.data
@@ -185,8 +184,8 @@ def mroots():
             data['x'] = result[0]
             data['iter'] = result[1]
             data['error'] = result[2]
-        except ZeroDivisionError:
-            data['fail'] = 'ZeroDivisionError: Check your arguments'
+        except Exception as e:
+            data['fail'] = str(e)
     return render_template('mroots.html', title="Multiple Roots", color_class="nonlinear",form=form,result=data)
 
 #Linear Methods
