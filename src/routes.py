@@ -5,7 +5,7 @@ from forms import *
 from util.utilities import plot_png, domain, parse_matrix, parse_vector, lambda_parser
 from methods.one_variable_eqs import *
 from methods.linear_equations import *
-from methods.interpolation import *
+from methods.interpolation import interpolate as interpolation_m
 from sympy import *
 
 x_sym = symbols('x')
@@ -332,7 +332,7 @@ def r_interpol(method):
             x = parse_vector(form.x.data)
             y = parse_vector(form.y.data)
             val = form.val.data
-            result = interpolate(method, x, y)
+            result = interpolation_m(method, x, y)
             data['p'] = result[0](val)
             data['val'] = val
             data['expr'] = latex(result[1])
@@ -344,91 +344,3 @@ def r_interpol(method):
             traceback.print_exc()
             data['fail'] = str(e)
     return render_template('interpolate.html', title=method, color_class="interpol",form=form,result=data)
-
-@app.route('/lagrange', methods=['GET', 'POST'])
-def lagrange():
-    data = {}
-    form = InterpolForm()
-    if form.validate_on_submit():
-        try:
-            x = parse_vector(form.x.data)
-            y = parse_vector(form.y.data)
-            val = form.val.data
-            result = divided_differences(x, y)
-            data['p'] = result[0](val)
-            data['val'] = val
-            data['expr'] = latex(result[1])
-            points = list(zip(x,y))
-            points.append((val, data['p']))
-            data['img'] = plot_png(result[0], (min(val, min(x)) - 10, max(val, max(x)) + 10), points)
-        except Exception as e:
-            import traceback
-            traceback.print_exc()
-            data['fail'] = str(e)
-    return render_template('interpolate.html', title="Lagrange Polynomial", color_class="interpol",form=form,result=data)
-
-@app.route('/linear_spline', methods=['GET', 'POST'])
-def linear_spline():
-    data = {}
-    form = InterpolForm()
-    if form.validate_on_submit():
-        try:
-            x = parse_vector(form.x.data)
-            y = parse_vector(form.y.data)
-            val = form.val.data
-            result = divided_differences(x, y)
-            data['p'] = result[0](val)
-            data['val'] = val
-            data['expr'] = latex(result[1])
-            points = list(zip(x,y))
-            points.append((val, data['p']))
-            data['img'] = plot_png(result[0], (min(val, min(x)) - 10, max(val, max(x)) + 10), points)
-        except Exception as e:
-            import traceback
-            traceback.print_exc()
-            data['fail'] = str(e)
-    return render_template('interpolate.html', title="Linear Spline", color_class="interpol",form=form,result=data)
-
-@app.route('/quadratic_spline', methods=['GET', 'POST'])
-def quadratic_spline():
-    data = {}
-    form = InterpolForm()
-    if form.validate_on_submit():
-        try:
-            x = parse_vector(form.x.data)
-            y = parse_vector(form.y.data)
-            val = form.val.data
-            result = divided_differences(x, y)
-            data['p'] = result[0](val)
-            data['val'] = val
-            data['expr'] = latex(result[1])
-            points = list(zip(x,y))
-            points.append((val, data['p']))
-            data['img'] = plot_png(result[0], (min(val, min(x)) - 10, max(val, max(x)) + 10), points)
-        except Exception as e:
-            import traceback
-            traceback.print_exc()
-            data['fail'] = str(e)
-    return render_template('interpolate.html', title="Quadratic Spline", color_class="interpol",form=form,result=data)
-
-@app.route('/vandermonde', methods=['GET', 'POST'])
-def vandermonde():
-    data = {}
-    form = InterpolForm()
-    if form.validate_on_submit():
-        try:
-            x = parse_vector(form.x.data)
-            y = parse_vector(form.y.data)
-            val = form.val.data
-            result = divided_differences(x, y)
-            data['p'] = result[0](val)
-            data['val'] = val
-            data['expr'] = latex(result[1])
-            points = list(zip(x,y))
-            points.append((val, data['p']))
-            data['img'] = plot_png(result[0], (min(val, min(x)) - 10, max(val, max(x)) + 10), points)
-        except Exception as e:
-            import traceback
-            traceback.print_exc()
-            data['fail'] = str(e)
-    return render_template('interpolate.html', title="Vandermonde", color_class="interpol",form=form,result=data)
